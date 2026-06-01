@@ -38,6 +38,7 @@ const Login = () => {
       }
       toast.success('login succesfull!');
       console.log(res);
+      localStorage.setItem("token", res.token);
       navigate('/dashboard')
     } catch (error) {
       toast.error("login error")

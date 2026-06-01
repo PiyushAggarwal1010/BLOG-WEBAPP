@@ -4,32 +4,34 @@ import Register from './components/Register';
 import Login from './components/Login';
 import { Toaster } from "react-hot-toast";
 import Dashboard from './components/Dashboard';
+import Protected from './components/Protected';
 
-const router= createBrowserRouter(
+const router = createBrowserRouter(
   [
     {
-      path:"/",
+      path: "/",
       element: <div>
         <Login />
       </div>
     },
     {
-      path:"/register",
+      path: "/register",
       element: <div>
         <Register />
       </div>
     },
     {
-      path:"/dashboard",
+      path: "/dashboard",
       element: <div>
-        <Dashboard />
+        <Protected>
+          <Dashboard />
+        </Protected>
       </div>
     }
   ]
 )
 
 function App() {
-
   return (
     <>
       <Toaster />

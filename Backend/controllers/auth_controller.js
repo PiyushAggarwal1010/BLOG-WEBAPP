@@ -78,4 +78,26 @@ const login = async (req, res) => {
     }
 }
 
-module.exports = { register, login};
+const getMe = async (req, res) => {
+    try { 
+        const user = await userModel.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+        res.status(200).json({
+            message: "fetched succesfully",
+            user: {
+                username: user.username,
+                email: user.email
+            }
+        })
+    } catch (error) {
+        res.status(401).json({
+            message: "Invalid or expired token"
+        })
+    }
+}
+
+module.exports = { register, login, getMe };
