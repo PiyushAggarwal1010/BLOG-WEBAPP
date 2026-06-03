@@ -5,11 +5,19 @@ import Login from './components/Login';
 import { Toaster } from "react-hot-toast";
 import Dashboard from './components/Dashboard';
 import Protected from './components/Protected';
+import Home from './components/Home';
+import { AuthProvider } from "./context/AuthContext";
 
 const router = createBrowserRouter(
   [
     {
       path: "/",
+      element: <div>
+        <Home />
+      </div>
+    },
+    {
+      path: "/login",
       element: <div>
         <Login />
       </div>
@@ -34,8 +42,10 @@ const router = createBrowserRouter(
 function App() {
   return (
     <>
-      <Toaster />
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <Toaster />
+        <RouterProvider router={router} />
+      </AuthProvider>
     </>
   )
 }

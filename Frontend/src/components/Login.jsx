@@ -2,46 +2,27 @@ import React, {useState} from 'react'
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useNavigate } from 'react-router-dom';
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate=useNavigate();
-
-  function handleEmailChange(val) {
-    setEmail(val);
-  }
-  function handlePassChange(val) {
-    setPassword(val);
-  }
+  const { login } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
-
+    setLoading(true);
     try {
-      const user = {
-        email,
-        password
-      }
-      const response = await fetch(`http://localhost:3000/api/auth/login`, {
-        method: "POST",
-        headers: {
-          'Content-Type': "application/json"
-        },
-        body: JSON.stringify(user)
-      })
-      
-      const res=await(response.json())
-      if (!response.ok) {
-        toast.error(res.message);
-        return;
-      }
-      toast.success('login succesfull!');
-      console.log(res);
-      localStorage.setItem("token", res.token);
-      navigate('/dashboard')
+      await login(email,password);
+      toast.success("login successful!");
+      navigate("/");
     } catch (error) {
-      toast.error("login error")
+      toast.error(error.message);
+    } finally{
+      setLoading(false);
     }
   }
 
@@ -59,7 +40,7 @@ const Login = () => {
             <label className="block text-gray-300 mb-2">
               Email
             </label>
-            <input onChange={(e) => handleEmailChange(e.target.value)}
+            <input onChange={(e) => setEmail(e.target.value)}
               type="email"
               placeholder="Enter your email"
               className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -71,7 +52,7 @@ const Login = () => {
             <label className="block text-gray-300 mb-2">
               Password
             </label>
-            <input onChange={(e) => handlePassChange(e.target.value)}
+            <input onChange={(e) => setPassword(e.target.value)}
               type="password"
               placeholder="Enter your password"
               className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -82,8 +63,9 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

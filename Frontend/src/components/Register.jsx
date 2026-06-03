@@ -8,16 +8,6 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const navigate=useNavigate();
 
-  function handleNameChange(val) {
-    setUsername(val);
-  }
-  function handleEmailChange(val) {
-    setEmail(val);
-  }
-  function handlePassChange(val) {
-    setPassword(val);
-  }
-
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -63,7 +53,7 @@ const Register = () => {
             <label className="block text-gray-300 mb-2">
               Username
             </label>
-            <input onChange={(e) => handleNameChange(e.target.value)}
+            <input onChange={(e) => setUsername(e.target.value)}
               type="text"
               placeholder="Enter username"
               className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -75,7 +65,7 @@ const Register = () => {
             <label className="block text-gray-300 mb-2">
               Email
             </label>
-            <input onChange={(e) => handleEmailChange(e.target.value)}
+            <input onChange={(e) => setEmail(e.target.value)}
               type="email"
               placeholder="Enter email"
               className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -87,7 +77,7 @@ const Register = () => {
             <label className="block text-gray-300 mb-2">
               Password
             </label>
-            <input onChange={(e) => handlePassChange(e.target.value)}
+            <input onChange={(e) => setPassword(e.target.value)}
               type="password"
               placeholder="Enter password"
               className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
