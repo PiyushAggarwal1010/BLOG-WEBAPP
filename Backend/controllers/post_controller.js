@@ -21,6 +21,7 @@ const createPost = async (req, res) => {
         })
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             message: "internal server error",
         })
@@ -50,11 +51,6 @@ const getMyPosts = async (req, res) => {
     try {
         const id = req.user.id;
         const posts = await postModel.find({ author: id }).sort({ createdAt: -1 });
-        if (posts.length === 0) {
-            return res.status(404).json({
-                message: "No posts found"
-            })
-        }
         res.status(200).json({
             message: "Posts fetched succesfully",
             posts
@@ -85,6 +81,7 @@ const deleteMyPost = async (req, res) => {
             message: "post deleted succesfully"
         })
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             message: "Internal Server Error"
         })
@@ -120,10 +117,31 @@ const updateMyPost = async (req, res) => {
             message: "post updated succesfully"
         })
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             message: "Internal Server Error"
         })
     }
 }
 
-module.exports = { createPost, getAllPosts, getMyPosts, deleteMyPost, updateMyPost };
+const getSinglePost = async (req, res) => {
+    try {
+        const postId = req.params.id;
+
+        const post = await postModel.findById(postId).populate('author', 'username');
+
+        if (!post) {
+            res.status(404).json({
+                message: "post not found",
+            })
+        }
+        res.status(200).json({
+            post,
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+module.exports = { createPost, getAllPosts, getMyPosts, deleteMyPost, updateMyPost, getSinglePost };

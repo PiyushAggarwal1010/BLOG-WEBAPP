@@ -1,12 +1,14 @@
 import './App.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Register from './components/Register';
-import Login from './components/Login';
+import { AuthProvider } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import PostDetails from './components/PostDetails';
 import Dashboard from './components/Dashboard';
 import Protected from './components/Protected';
+import Register from './components/Register';
+import AddPost from './components/AddPost';
+import Login from './components/Login';
 import Home from './components/Home';
-import { AuthProvider } from "./context/AuthContext";
 
 const router = createBrowserRouter(
   [
@@ -35,7 +37,23 @@ const router = createBrowserRouter(
           <Dashboard />
         </Protected>
       </div>
-    }
+    },
+    {
+      path: "/AddPost",
+      element: <div>
+        <Protected>
+          <AddPost />
+        </Protected>
+      </div>
+    },
+    {
+      path: "/post/:id",
+      element: <div>
+        <Protected>
+          <PostDetails />
+        </Protected>
+      </div>
+    },
   ]
 )
 

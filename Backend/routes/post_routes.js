@@ -8,5 +8,6 @@ router.get('/',postController.getAllPosts);
 router.get('/my-posts',authMiddleware, postController.getMyPosts);
 router.delete('/:id',authMiddleware,postController.deleteMyPost);
 router.patch('/:id',authMiddleware,postController.updateMyPost);
+router.get('/:id',postController.getSinglePost);
 
 module.exports=router;

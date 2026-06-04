@@ -39,6 +39,7 @@ const register = async (req, res) => {
         })
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             message: "internal server error"
         })
@@ -72,6 +73,7 @@ const login = async (req, res) => {
         });
 
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             message: "internal server error"
         })
@@ -94,8 +96,9 @@ const getMe = async (req, res) => {
             }
         })
     } catch (error) {
-        res.status(401).json({
-            message: "Invalid or expired token"
+        console.error(error);
+        res.status(500).json({
+            message: "Internal server error"
         })
     }
 }

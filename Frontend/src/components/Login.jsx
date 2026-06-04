@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import { AuthContext } from "../context/AuthContext";
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
 
@@ -16,12 +16,12 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(email,password);
+      await login(email, password);
       toast.success("login successful!");
       navigate("/");
     } catch (error) {
       toast.error(error.message);
-    } finally{
+    } finally {
       setLoading(false);
     }
   }
@@ -47,7 +47,6 @@ const Login = () => {
             />
           </div>
 
-          {/* Password */}
           <div className="mb-6">
             <label className="block text-gray-300 mb-2">
               Password
@@ -59,7 +58,6 @@ const Login = () => {
             />
           </div>
 
-          {/* Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
@@ -69,13 +67,17 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Register Link */}
         <p className="text-gray-400 text-sm text-center mt-4">
           Don't have an account?{" "}
           <Link to="/register" className="text-blue-500 cursor-pointer hover:underline">
             Register
           </Link>
         </p>
+        <div className="text-center mt-4">
+          <Link to="/" className="text-sm text-gray-400 hover:text-white transition underline">
+            ← Back to Home
+          </Link>
+        </div>
 
       </div>
     </div>
