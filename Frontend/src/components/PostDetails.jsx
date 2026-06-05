@@ -16,12 +16,13 @@ const PostDetails = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState("");
     const [editContent, setEditContent] = useState("");
+    const [showConfirm, setShowConfirm] = useState(false);
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`http://localhost:3000/api/posts/${id}`)
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`)
                 const data = await res.json();
 
                 if (!res.ok) {
@@ -36,14 +37,12 @@ const PostDetails = () => {
             }
         };
         fetchPost();
-    }, [id])
+    }, [id,navigate])
 
     const handleDelete = async () => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this post?");
-        if (!confirmDelete) return;
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`http://localhost:3000/api/posts/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -52,7 +51,7 @@ const PostDetails = () => {
             if (!res.ok) throw new Error("Failed to delete post");
 
             toast.success("Post deleted successfully");
-            navigate('/');
+            navigate(-1);
         } catch (error) {
             toast.error(error.message || "Could not delete post");
         }
@@ -63,7 +62,7 @@ const PostDetails = () => {
 
         try {
             const token = localStorage.getItem("token");
-            const res = await fetch(`http://localhost:3000/api/posts/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -85,8 +84,9 @@ const PostDetails = () => {
         }
     }
 
+    if (loading) return <p className="text-center mt-10">Loading...</p>;
     if (!post) return null;
-    const isOwner = user?.username === post.author?.username;
+    const isOwner = user?._id === post.author?._id;
 
     return (
         <div className="bg-gray-900 min-h-screen text-white">
@@ -157,7 +157,7 @@ const PostDetails = () => {
                                         Edit
                                     </button>
                                     <button
-                                        onClick={handleDelete}
+                                        onClick={() => setShowConfirm(true)}
                                         className="bg-red-600 hover:bg-red-700 px-4 py-1 rounded text-sm transition"
                                     >
                                         Delete
@@ -171,8 +171,34 @@ const PostDetails = () => {
                         </div>
                     </>
                 )}
-
             </div>
+
+            {showConfirm && (
+                <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                    <div className="bg-gray-800 text-white p-6 rounded-xl shadow-lg w-80">
+                    <p className="mb-4 text-center">Are you sure you want to delete this post?</p>
+
+                    <div className="flex justify-center gap-4">
+                        <button
+                        onClick={() => {
+                            setShowConfirm(false);
+                            handleDelete(); 
+                        }}
+                        className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
+                        >
+                        Yes
+                        </button>
+
+                        <button
+                        onClick={() => setShowConfirm(false)}
+                        className="bg-gray-600 px-4 py-2 rounded hover:bg-gray-700"
+                        >
+                        Cancel
+                        </button>
+                    </div>
+                    </div>
+                </div>
+                )}
         </div>
     );
 }

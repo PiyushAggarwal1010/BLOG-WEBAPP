@@ -21,7 +21,7 @@ const AddPost = () => {
                 title,
                 content
             }
-            const res = await fetch(`http://localhost:3000/api/posts`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/posts` , {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

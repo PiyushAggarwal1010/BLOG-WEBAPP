@@ -4,7 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import Card from './Card';
 
 const Dashboard = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [posts, updatePosts] = useState([]);
 
@@ -17,7 +17,7 @@ const Dashboard = () => {
           setLoading(false);
           return;
         }
-        const res = await fetch(`http://localhost:3000/api/posts/my-posts`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/my-posts`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`
@@ -39,11 +39,11 @@ const Dashboard = () => {
     };
     getPosts();
   }, []);
-  
+
   return (
     <div className="bg-gray-900 min-h-screen text-white">
       <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">
+        <h1 className="text-2xl font-bold m-6 ">
           Welcome, {user?.username}
         </h1>
 
