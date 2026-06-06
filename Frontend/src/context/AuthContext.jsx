@@ -65,6 +65,29 @@ const AuthProvider = ({ children }) => {
         await checkAuth();
     };
 
+    const register = async (username, email, password) => {
+        const newUser = {
+            username,
+            email,
+            password
+        };
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
+            method: "POST",
+            headers: {
+                'Content-Type': "application/json"
+            },
+            body: JSON.stringify(newUser)
+        })
+
+        const res = await (response.json())
+        if (!response.ok) {
+            throw new Error(res.message);
+        }
+
+        localStorage.setItem("token", res.token);
+        await checkAuth();
+    }
+
     const logout = () => {
         localStorage.removeItem("token");
         setUser(null);
@@ -72,7 +95,7 @@ const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isLoggedIn,checkAuth, loading, logout, login }}>
+        <AuthContext.Provider value={{ user, isLoggedIn, checkAuth, loading, logout, login, register }}>
             {children}
         </AuthContext.Provider>
     );

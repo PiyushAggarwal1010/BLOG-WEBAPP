@@ -11,42 +11,19 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { checkAuth } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     try {
-      const newUser = {
-        username,
-        email,
-        password
-      };
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          'Content-Type': "application/json"
-        },
-        body: JSON.stringify(newUser)
-      })
-
-      const res = await (response.json())
-      if (!response.ok) {
-        toast.error(res.message);
-        setLoading(false);
-        return;
-      }
-
-      localStorage.setItem("token", res.token);
-      await checkAuth();
+      await register(username,email,password);
 
       toast.success('Successfully registered!');
-      console.log(res);
       navigate('/')
-
     } catch (error) {
-      toast.error('registration error')
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
