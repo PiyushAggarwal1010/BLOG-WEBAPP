@@ -21,7 +21,7 @@ const AddPost = () => {
                 title,
                 content
             }
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/posts` , {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,49 +47,58 @@ const AddPost = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 font-sans py-12">
             <form
                 onSubmit={PostBlog}
-                className="bg-gray-800 w-full max-w-xl p-6 rounded-2xl shadow-lg"
+                className="bg-white w-full max-w-2xl p-8 md:p-10 rounded-2xl shadow-sm border border-stone-200"
             >
-                <h2 className="text-2xl font-bold text-white mb-6 text-center">
-                    Create New Post
-                </h2>
+                <div className="mb-8 text-center border-b border-stone-100 pb-6">
+                    <h2 className="text-3xl md:text-4xl font-black text-stone-900 ">
+                        Create New Post
+                    </h2>
+                    <p className="text-stone-500 mt-2 font-medium">Share your thoughts with the world.</p>
+                </div>
 
-                {/* Title */}
-                <div className="mb-4">
-                    <label className="block text-gray-300 mb-2">
-                        Enter Title
+                <div className="mb-6">
+                    <label className="block text-stone-500 font-medium mb-2 text-sm tracking-wide">
+                        POST TITLE
                     </label>
                     <input
                         onChange={(e) => setTitle(e.target.value)}
                         type="text"
                         placeholder="Enter the title here..."
-                        className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-3 bg-stone-50 text-stone-900 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all font-semibold text-lg placeholder-stone-400"
                     />
                 </div>
 
-                {/* Content */}
-                <div className="mb-6">
-                    <label className="block text-gray-300 mb-2">
-                        Enter Content
+                <div className="mb-8">
+                    <label className="block text-stone-500 font-medium mb-2 text-sm uppercase tracking-wide">
+                        Post Content
                     </label>
                     <textarea
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="Enter the content here..."
-                        rows="5"
-                        className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Write your story here..."
+                        rows="8"
+                        className="w-full px-4 py-3 bg-stone-50 text-stone-800 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all whitespace-pre-wrap leading-relaxed placeholder-stone-400"
                     />
                 </div>
 
-                {/* Button */}
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-                >
-                    {loading ? "Posting..." : "Post"}
-                </button>
+                <div className="flex gap-4 items-center">
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="px-6 py-3 rounded-full text-stone-600 font-medium hover:bg-stone-100 transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="grow bg-stone-900 text-white py-3 rounded-full font-medium hover:bg-stone-800 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                    >
+                        {loading ? "Publishing..." : "Publish Post"}
+                    </button>
+                </div>
             </form>
         </div>
     )

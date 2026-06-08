@@ -3,19 +3,19 @@ import { Link } from "react-router-dom";
 
 const Card = ({ data }) => {
   return (
-    <Link to={`/post/${data._id}`} className="block">
-      <div className="bg-gray-800 text-white rounded-lg p-4 m-3 shadow-md ">
-        <h3 className="text-xl font-bold mb-2 line-clamp-1">
+    <Link to={`/post/${data._id}`} className="block h-full">
+      <div className="bg-white text-stone-800 rounded-xl p-6 shadow-sm border border-stone-200 hover:shadow-md hover:border-stone-300 transition-all h-full flex flex-col">
+        <h3 className="text-lg font-bold mb-3 line-clamp-2 text-stone-900 leading-tight">
           {data.title}
         </h3>
 
-        <p className="text-gray-300 mb-3 line-clamp-3 overflow-hidden">
-          {data.content}
+        <p className="text-stone-600 mb-6 line-clamp-3 overflow-hidden text-sm leading-relaxed grow">
+          {data.content}  
         </p>
 
         {data.author &&
-          <div className="text-sm text-gray-400">
-            Author: {data.author.username}
+          <div className="text-xs font-medium text-stone-500 uppercase mt-auto pt-4 border-t border-stone-100">
+            By {data.author.username}
           </div>
         }
       </div>

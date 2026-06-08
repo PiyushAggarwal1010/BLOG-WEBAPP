@@ -37,7 +37,7 @@ const PostDetails = () => {
             }
         };
         fetchPost();
-    }, [id,navigate])
+    }, [id, navigate])
 
     const handleDelete = async () => {
         try {
@@ -89,60 +89,65 @@ const PostDetails = () => {
     const isOwner = user?._id === post.author?._id;
 
     return (
-        <div className="bg-gray-900 min-h-screen text-white">
+        <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">
             <Header />
 
-            <div className="max-w-3xl mx-auto p-6 mt-8 bg-gray-800 rounded-2xl shadow-xl">
+            <div className="max-w-3xl mx-auto p-8 md:p-12 mt-8 md:mt-12 bg-white rounded-2xl shadow-sm border border-stone-200">
                 {isEditing ? (
                     <form onSubmit={handleUpdate}>
-                        <div className="mb-4">
-                            <label className="block text-gray-400 mb-2 text-sm">Edit Title</label>
+                        <div className="mb-6">
+                            <label className="block text-stone-500 font-medium mb-2 text-sm uppercase tracking-wide">Edit Title</label>
                             <input
                                 type="text"
                                 value={editTitle}
                                 onChange={(e) => setEditTitle(e.target.value)}
-                                className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-3 bg-stone-50 text-stone-900 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all font-semibold text-lg"
                                 required
                             />
                         </div>
 
-                        <div className="mb-6">
-                            <label className="block text-gray-400 mb-2 text-sm">Edit Content</label>
+                        <div className="mb-8">
+                            <label className="block text-stone-500 font-medium mb-2 text-sm uppercase tracking-wide">Edit Content</label>
                             <textarea
                                 value={editContent}
                                 onChange={(e) => setEditContent(e.target.value)}
-                                rows="8"
-                                className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 whitespace-pre-wrap"
+                                rows="12"
+                                className="w-full px-4 py-3 bg-stone-50 text-stone-800 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all whitespace-pre-wrap leading-relaxed"
                                 required
                             />
                         </div>
 
-                        <div className="flex gap-3 justify-end border-t border-gray-700 pt-4">
+                        <div className="flex gap-4 justify-end border-t border-stone-100 pt-6">
                             <button
                                 type="button"
                                 onClick={() => {
                                     setIsEditing(false);
-                                    setEditTitle(post.title); // Reset inputs back to actual post details
+                                    setEditTitle(post.title);
                                     setEditContent(post.content);
                                 }}
-                                className="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg text-sm transition"
+                                className="px-6 py-2.5 rounded-full text-stone-600 font-medium hover:bg-stone-100 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm transition font-medium"
+                                className="bg-stone-900 hover:bg-stone-800 text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-md"
                             >
                                 Save Changes
                             </button>
                         </div>
                     </form>
                 ) : (
-                    <>
-                        <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+                    <article>
+                        <h1 className="text-4xl md:text-5xl font-black mb-6 text-stone-900 leading-tight tracking-tight">
+                            {post.title}
+                        </h1>
 
-                        <div className="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
-                            <span className="text-gray-400">By {post.author.username}</span>
+                        <div className="flex flex-wrap justify-between items-center border-b border-stone-100 pb-6 mb-8 gap-4">
+                            <div className="flex flex-col">
+                                <span className="text-stone-400 text-sm uppercase tracking-widest font-semibold">Author</span>
+                                <span className="text-stone-800 font-medium">{post.author.username}</span>
+                            </div>
 
                             {isOwner && (
                                 <div className="flex gap-3">
@@ -152,13 +157,13 @@ const PostDetails = () => {
                                             setEditTitle(post.title);
                                             setIsEditing(true);
                                         }}
-                                        className="bg-yellow-600 hover:bg-yellow-700 px-4 py-1 rounded text-sm transition"
+                                        className="bg-stone-100 text-stone-700 hover:bg-stone-200 px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
                                     >
                                         Edit
                                     </button>
                                     <button
                                         onClick={() => setShowConfirm(true)}
-                                        className="bg-red-600 hover:bg-red-700 px-4 py-1 rounded text-sm transition"
+                                        className="bg-rose-50 text-rose-600 hover:bg-rose-100 px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
                                     >
                                         Delete
                                     </button>
@@ -166,39 +171,40 @@ const PostDetails = () => {
                             )}
                         </div>
 
-                        <div className="text-gray-200 leading-relaxed whitespace-pre-wrap">
+                        <div className="text-stone-700 leading-loose whitespace-pre-wrap text-lg md:text-xl wrap-break-word font-serif">
                             {post.content}
                         </div>
-                    </>
+                    </article>
                 )}
             </div>
-
             {showConfirm && (
-                <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-                    <div className="bg-gray-800 text-white p-6 rounded-xl shadow-lg w-80">
-                    <p className="mb-4 text-center">Are you sure you want to delete this post?</p>
+                <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+                    <div className="bg-white text-stone-800 p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-auto transform transition-all">
+                        <h3 className="text-xl font-bold mb-2 text-stone-900 text-center">Delete Post?</h3>
+                        <p className="mb-8 text-center text-stone-500 leading-relaxed">
+                            Are you sure you want to permanently delete this post?
+                        </p>
 
-                    <div className="flex justify-center gap-4">
-                        <button
-                        onClick={() => {
-                            setShowConfirm(false);
-                            handleDelete(); 
-                        }}
-                        className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
-                        >
-                        Yes
-                        </button>
-
-                        <button
-                        onClick={() => setShowConfirm(false)}
-                        className="bg-gray-600 px-4 py-2 rounded hover:bg-gray-700"
-                        >
-                        Cancel
-                        </button>
-                    </div>
+                        <div className="flex flex-col sm:flex-row justify-center gap-3">
+                            <button
+                                onClick={() => setShowConfirm(false)}
+                                className="w-full sm:w-auto bg-stone-100 text-stone-700 px-6 py-2.5 rounded-full font-medium hover:bg-stone-200 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowConfirm(false);
+                                    handleDelete();
+                                }}
+                                className="w-full sm:w-auto bg-rose-600 text-white px-6 py-2.5 rounded-full font-medium hover:bg-rose-700 transition-colors shadow-sm"
+                            >
+                                Yes, delete
+                            </button>
+                        </div>
                     </div>
                 </div>
-                )}
+            )}
         </div>
     );
 }

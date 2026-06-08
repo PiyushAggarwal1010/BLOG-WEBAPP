@@ -41,15 +41,18 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="bg-gray-900 min-h-screen text-white">
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-2xl font-bold m-6 ">
-          Welcome, {user?.username}
-        </h1>
+    <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">
+      <div className="max-w-7xl mx-auto p-6 md:p-8">
+        <div className="mb-10 pb-6 border-b border-stone-200">
+          <h1 className="text-3xl md:text-4xl font-black text-stone-900 tracking-tight pb-1.5">
+            Welcome, {user?.username}
+          </h1>
+          <p className="text-stone-500 mt-2 text-lg">Manage your published posts below.</p>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {posts.length === 0 ? (
-            <p className="text-gray-400">
+            <p className="text-stone-500 col-span-full text-center py-16 text-lg bg-white rounded-2xl border-2 border-stone-300 border-dashed">
               You haven't created any posts yet.
             </p>
           ) : (

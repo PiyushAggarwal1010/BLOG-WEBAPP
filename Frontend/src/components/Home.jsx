@@ -16,9 +16,9 @@ const Home = () => {
     const searchQuery = searchParams.get('q') || '';
 
     const CreateNewPost = () => {
-        if(isLoggedIn){
+        if (isLoggedIn) {
             navigate('/AddPost');
-        }else{
+        } else {
             navigate('/login');
         }
     }
@@ -39,29 +39,29 @@ const Home = () => {
         getPosts();
     }, []);
 
-    const filteredPosts = posts.filter(post => 
+    const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
-        <div className="bg-gray-900 min-h-screen text-white">
+        <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">
             <Header />
 
-            <div className="p-6 max-w-7xl mx-auto">
+            <div className="p-6 md:p-8 max-w-7xl mx-auto">
                 {searchQuery && (
-                    <h2 className="text-xl text-gray-300 mb-6">
-                        Showing results for: <span className="text-white font-bold">"{searchQuery}"</span>
+                    <h2 className="text-xl text-stone-600 mb-8 pb-4 border-b border-stone-200">
+                        Showing results for: <span className="text-stone-900 font-semibold">"{searchQuery}"</span>
                     </h2>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredPosts.length > 0 ? (
                         filteredPosts.map((post) => (
                             <Card key={post._id} data={post} />
                         ))
                     ) : (
-                        <p className="text-gray-400 col-span-full text-center py-10">
+                        <p className="text-stone-500 col-span-full text-center py-16 text-lg">
                             No posts found matching your search.
                         </p>
                     )}
@@ -70,9 +70,9 @@ const Home = () => {
 
             <button
                 onClick={CreateNewPost}
-                className="fixed bottom-6 right-6 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700"
+                className="fixed bottom-8 right-8 bg-stone-900 text-white px-6 py-3 rounded-full font-medium shadow-lg hover:bg-stone-800 hover:shadow-xl transition-all duration-200 flex items-center gap-2"
             >
-                + Add Post
+                <span className="text-xl leading-none mb-0.5">+</span> Add Post
             </button>
         </div>
     )
