@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const Card = ({ data }) => {
   return (
     <Link to={`/post/${data._id}`} className="block h-full">
-      <div className="bg-white text-stone-800 rounded-xl p-6 shadow-sm border border-stone-200 hover:shadow-md hover:border-stone-300 transition-all h-full flex flex-col">
+      <div className="bg-white text-stone-800 rounded-xl p-6 border-2 shadow-sm border-stone-200 hover:shadow-md hover:border-stone-300 transition-all h-full flex flex-col">
         <h3 className="text-lg font-bold mb-3 line-clamp-2 text-stone-900 leading-tight">
           {data.title}
         </h3>

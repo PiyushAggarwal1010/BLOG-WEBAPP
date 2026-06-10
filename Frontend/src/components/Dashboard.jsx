@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Card from './Card';
+import Header from './Header';
+import { useSearchParams } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [posts, updatePosts] = useState([]);
+
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') || '';
 
   useEffect(() => {
     const getPosts = async () => {
@@ -40,8 +45,17 @@ const Dashboard = () => {
     getPosts();
   }, []);
 
+  const filteredPosts = posts.filter(post =>
+    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    post.content.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
+
     <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">
+
+      <Header />
+
       <div className="max-w-7xl mx-auto p-6 md:p-8">
         <div className="mb-10 pb-6 border-b border-stone-200">
           <h1 className="text-3xl md:text-4xl font-black text-stone-900 tracking-tight pb-1.5">
@@ -51,12 +65,12 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {posts.length === 0 ? (
+          {filteredPosts.length === 0 ? (
             <p className="text-stone-500 col-span-full text-center py-16 text-lg bg-white rounded-2xl border-2 border-stone-300 border-dashed">
-              You haven't created any posts yet.
+              No Posts Found.
             </p>
           ) : (
-            posts.map((post) => (
+            filteredPosts.map((post) => (
               <Card key={post._id} data={post} />
             ))
           )}

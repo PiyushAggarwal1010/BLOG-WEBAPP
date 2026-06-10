@@ -50,7 +50,7 @@ const getAllPosts = async (req, res) => {
 const getMyPosts = async (req, res) => {
     try {
         const id = req.user.id;
-        const posts = await postModel.find({ author: id }).sort({ createdAt: -1 });
+        const posts = await postModel.find({ author: id }).populate('author', 'username').sort({ createdAt: -1 });
         res.status(200).json({
             message: "Posts fetched succesfully",
             posts

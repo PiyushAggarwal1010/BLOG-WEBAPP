@@ -62,7 +62,7 @@ const Home = () => {
                         ))
                     ) : (
                         <p className="text-stone-500 col-span-full text-center py-16 text-lg">
-                            No posts found matching your search.
+                            No posts found.
                         </p>
                     )}
                 </div>
