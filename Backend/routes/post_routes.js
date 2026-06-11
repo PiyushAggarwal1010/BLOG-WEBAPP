@@ -8,6 +8,7 @@ router.get('/',postController.getAllPosts);
 router.get('/my-posts',authMiddleware, postController.getMyPosts);
 router.delete('/:id',authMiddleware,postController.deleteMyPost);
 router.patch('/:id',authMiddleware,postController.updateMyPost);
-router.get('/:id',postController.getSinglePost);
+router.get('/:id',authMiddleware, postController.getSinglePost);
+router.post('/:id/like', authMiddleware,postController.handleLikes);
 
 module.exports=router;

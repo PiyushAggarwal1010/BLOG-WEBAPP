@@ -4,6 +4,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Header from './Header';
 import toast from 'react-hot-toast';
+import { FaHeart } from "react-icons/fa";
 
 const PostDetails = () => {
     const { id } = useParams();
@@ -17,18 +18,28 @@ const PostDetails = () => {
     const [editTitle, setEditTitle] = useState("");
     const [editContent, setEditContent] = useState("");
     const [showConfirm, setShowConfirm] = useState(false);
+    const [liked, setLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(0);
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`)
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
                 const data = await res.json();
 
                 if (!res.ok) {
                     throw new Error(data.message || "Failed to load post");
                 }
+                console.log(data)
                 setPost(data.post);
+                setLiked(data.liked);
+                setLikesCount(data.post?.likesCount || 0);
             } catch (error) {
                 toast.error(error.message);
                 navigate('/');
@@ -79,6 +90,26 @@ const PostDetails = () => {
 
             setPost({ ...post, title: editTitle, content: editContent });
             setIsEditing(false);
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+    const handleLike = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/like`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (!res.ok) throw new Error("Failed to like post");
+            const data = await res.json();
+
+            setLiked(data.liked);
+            setLikesCount(data.likesCount);
         } catch (error) {
             toast.error(error.message);
         }
@@ -174,6 +205,20 @@ const PostDetails = () => {
                         <div className="text-stone-700 leading-loose whitespace-pre-wrap text-lg md:text-xl wrap-break-word font-serif">
                             {post.content}
                         </div>
+                        <div className='flex items-center gap-1 mt-4'>
+                            <button
+                                onClick={handleLike}
+                                className={`text-xl cursor-pointer transition-all duration-200 
+                                ${liked
+                                        ? "text-red-500 scale-110"
+                                        : "text-gray-400 hover:text-red-300 hover:scale-110"
+                                    }`}
+                            >
+                                <FaHeart />
+                            </button>
+                            <span className="text-sm text-stone-600" >{likesCount}</span>
+                        </div>
+
                     </article>
                 )}
             </div>

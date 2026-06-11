@@ -127,16 +127,23 @@ const updateMyPost = async (req, res) => {
 const getSinglePost = async (req, res) => {
     try {
         const postId = req.params.id;
+        const userId = req.user?.id;
 
         const post = await postModel.findById(postId).populate('author', 'username');
 
         if (!post) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: "post not found",
             })
         }
+        const isLiked = userId
+            ? post.likes.some(id => id.toString() === userId)
+            : false
+            ;
+
         res.status(200).json({
             post,
+            liked: isLiked
         })
     } catch (error) {
         console.error(error);
@@ -144,4 +151,46 @@ const getSinglePost = async (req, res) => {
     }
 }
 
-module.exports = { createPost, getAllPosts, getMyPosts, deleteMyPost, updateMyPost, getSinglePost };
+const handleLikes = async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.user.id;
+
+        const post = await postModel.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        const alreadyLiked = post.likes.some(
+            (id) => id.toString() === userId
+        );
+
+        if (!alreadyLiked) {
+            post.likes.push(userId);
+            post.likesCount = post.likes.length;
+            await post.save();
+            return res.status(200).json({
+                message: 'Post liked',
+                likesCount: post.likesCount,
+                liked: true
+            });
+        }
+        else {
+            post.likes = post.likes.filter(id => id.toString() !== userId);
+            post.likesCount = post.likes.length;
+            await post.save();
+            return res.status(200).json({
+                message: 'Post unliked',
+                likesCount: post.likesCount,
+                liked: false
+            });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+module.exports = { createPost, getAllPosts, getMyPosts, deleteMyPost, updateMyPost, getSinglePost, handleLikes };
