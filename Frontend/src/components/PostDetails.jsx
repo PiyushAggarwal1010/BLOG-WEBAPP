@@ -23,7 +23,6 @@ const PostDetails = () => {
 
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
-    const [expandedComments, setExpandedComments] = useState({});
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -119,12 +118,17 @@ const PostDetails = () => {
     }
 
     const addComment = async () => {
+        if (!newComment.trim()) {
+            toast.error("Comment cannot be empty");
+            return;
+        }
+
         try {
             const token = localStorage.getItem("token");
             const commentData = {
                 postId: id,
                 userId: user._id,
-                content: newComment
+                content: newComment.trim()
             }
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/comment`, {
                 method: "POST",
@@ -319,27 +323,9 @@ const PostDetails = () => {
                                                 </div>
 
                                                 <div>
-                                                    <p
-                                                        className={`block w-full text-sm text-stone-600 leading-relaxed break-words 
-                                                            ${expandedComments[c._id] ? "line-clamp-none" : "line-clamp-3"
-                                                            }`}
-                                                    >
+                                                    <p className="block w-full text-sm text-stone-600 leading-relaxed wrap-break-word whitespace-pre-wrap">
                                                         {c.content}
                                                     </p>
-
-                                                    {c.content.length > 120 && (
-                                                        <button
-                                                            onClick={() =>
-                                                                setExpandedComments((prev) => ({
-                                                                    ...prev,
-                                                                    [c._id]: !prev[c._id],
-                                                                }))
-                                                            }
-                                                            className="text-xs text-stone-500 hover:text-stone-700 mt-1"
-                                                        >
-                                                            {expandedComments[c._id] ? "Read less" : "Read more"}
-                                                        </button>
-                                                    )}
                                                 </div>
                                             </div>
                                         ))}
