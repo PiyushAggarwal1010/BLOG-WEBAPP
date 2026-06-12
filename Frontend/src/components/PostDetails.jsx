@@ -21,6 +21,10 @@ const PostDetails = () => {
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
 
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState("");
+    const [expandedComments, setExpandedComments] = useState({});
+
     useEffect(() => {
         const fetchPost = async () => {
             try {
@@ -36,7 +40,6 @@ const PostDetails = () => {
                 if (!res.ok) {
                     throw new Error(data.message || "Failed to load post");
                 }
-                console.log(data)
                 setPost(data.post);
                 setLiked(data.liked);
                 setLikesCount(data.post?.likesCount || 0);
@@ -114,6 +117,58 @@ const PostDetails = () => {
             toast.error(error.message);
         }
     }
+
+    const addComment = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const commentData = {
+                postId: id,
+                userId: user._id,
+                content: newComment
+            }
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/comment`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(commentData)
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.message || "Failed to comment on post");
+            }
+            console.log(data);
+            setComments((prev) => [data.comm, ...prev]);
+            setNewComment("");
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+    useEffect(() => {
+        const getComments = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/comment`, {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+
+                })
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to fetch comments");
+                }
+                setComments(data.comments);
+            } catch (error) {
+                toast.error(error.message);
+            }
+        };
+        getComments();
+    }, [id])
 
     if (loading) return <p className="text-center mt-10">Loading...</p>;
     if (!post) return null;
@@ -205,6 +260,8 @@ const PostDetails = () => {
                         <div className="text-stone-700 leading-loose whitespace-pre-wrap text-lg md:text-xl wrap-break-word font-serif">
                             {post.content}
                         </div>
+
+                        {/* likes */}
                         <div className='flex items-center gap-1 mt-4'>
                             <button
                                 onClick={handleLike}
@@ -217,6 +274,78 @@ const PostDetails = () => {
                                 <FaHeart />
                             </button>
                             <span className="text-sm text-stone-600" >{likesCount}</span>
+                        </div>
+
+                        {/* Comments */}
+                        <div className="mt-12 border-t border-stone-100 pt-8">
+
+                            <div className="mb-8">
+                                <textarea
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    placeholder="Write a comment..."
+                                    rows="3"
+                                    className="w-full px-4 py-3 bg-stone-50 text-stone-800 border border-stone-300 rounded-xl resize-none"
+                                />
+
+                                <div className="flex justify-end mt-3">
+                                    <button
+                                        onClick={addComment}
+                                        className="bg-stone-900 hover:bg-stone-800 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-sm">
+                                        Add Comment
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h2 className="text-sm uppercase tracking-widest text-stone-400 font-semibold mb-6">
+                                    Comments
+                                </h2>
+
+                                {comments.length === 0 ? (
+                                    <p className="text-stone-400 text-sm">No comments yet</p>
+                                ) : (
+                                    <div className="space-y-6">
+                                        {comments.map((c) => (
+                                            <div key={c._id} className="border-b border-stone-200 pb-4">
+
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <p className="text-sm font-medium text-stone-800">
+                                                        {c.userId?.username || "User"}
+                                                    </p>
+                                                    <p className="text-xs text-stone-400">
+                                                        {new Date(c.createdAt).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p
+                                                        className={`block w-full text-sm text-stone-600 leading-relaxed break-words 
+                                                            ${expandedComments[c._id] ? "line-clamp-none" : "line-clamp-3"
+                                                            }`}
+                                                    >
+                                                        {c.content}
+                                                    </p>
+
+                                                    {c.content.length > 120 && (
+                                                        <button
+                                                            onClick={() =>
+                                                                setExpandedComments((prev) => ({
+                                                                    ...prev,
+                                                                    [c._id]: !prev[c._id],
+                                                                }))
+                                                            }
+                                                            className="text-xs text-stone-500 hover:text-stone-700 mt-1"
+                                                        >
+                                                            {expandedComments[c._id] ? "Read less" : "Read more"}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                     </article>

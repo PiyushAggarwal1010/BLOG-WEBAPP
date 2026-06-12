@@ -3,6 +3,7 @@ const connectDB=require('./config/db')
 const morgan = require('morgan');
 const auth_router=require('./routes/auth_routes')
 const post_router=require('./routes/post_routes')
+const comment_router=require('./routes/comment_routes')
 const cors=require('cors')
 
 const app = express();
@@ -19,11 +20,11 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use('/api/auth',auth_router);
 app.use('/api/posts',post_router);
+app.use('/api/posts',comment_router);
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Server Running');
 });
-
 
 app.listen(3000, () => {
   console.log(`Server is running at http://localhost:3000`);

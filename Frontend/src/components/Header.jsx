@@ -50,7 +50,7 @@ const Header = () => {
         <header className="bg-white border-b border-stone-200 sticky top-0 z-10">
             <div className="max-w-7xl mx-auto px-4 py-2 flex flex-col sm:flex-row gap-4 items-center justify-between">
 
-                <img src={logo} alt="Blog App" className='h-20 w-auto object-contain' />
+                <img src={logo} alt="Blog App" className='h-15 w-auto object-contain' />
 
                 <form onSubmit={handleSearch} className="flex items-center bg-stone-100 rounded-full px-4 py-2.5 w-full sm:w-95 border border-transparent focus-within:border-stone-300 focus-within:bg-white transition-all">
                     <input

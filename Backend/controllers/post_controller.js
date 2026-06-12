@@ -15,8 +15,8 @@ const createPost = async (req, res) => {
             content,
             author,
         })
-        res.status(201).json({
-            message: "post created succesfully",
+        return res.status(201).json({
+            message: "post created successfully",
             post
         })
 
@@ -35,8 +35,8 @@ const getAllPosts = async (req, res) => {
             .populate('author', 'username')
             .sort({ createdAt: -1 });
 
-        res.status(200).json({
-            message: "post fetched succesfully",
+        return res.status(200).json({
+            message: "post fetched successfully",
             posts
         })
     } catch (error) {
@@ -52,7 +52,7 @@ const getMyPosts = async (req, res) => {
         const id = req.user.id;
         const posts = await postModel.find({ author: id }).populate('author', 'username').sort({ createdAt: -1 });
         res.status(200).json({
-            message: "Posts fetched succesfully",
+            message: "Posts fetched successfully",
             posts
         })
     } catch (error) {
@@ -78,7 +78,7 @@ const deleteMyPost = async (req, res) => {
         }
         await post.deleteOne();
         res.status(200).json({
-            message: "post deleted succesfully"
+            message: "post deleted successfully"
         })
     } catch (error) {
         console.error(error);
