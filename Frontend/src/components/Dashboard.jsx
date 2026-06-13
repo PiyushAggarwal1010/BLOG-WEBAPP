@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthContext";
 import Card from './Card';
 import Header from './Header';
 import { useSearchParams } from 'react-router-dom';
+import Loader from './Loader';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -50,6 +51,9 @@ const Dashboard = () => {
     post.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (loading) {
+    return <Loader />
+  }
   return (
 
     <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">

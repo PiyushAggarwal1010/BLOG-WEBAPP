@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import Loader from './Loader';
 
 const Home = () => {
     const [posts, updatePosts] = useState([]);
@@ -43,7 +44,10 @@ const Home = () => {
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
+    
+    if(loading){
+        return <Loader />
+    }
     return (
         <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">
             <Header />

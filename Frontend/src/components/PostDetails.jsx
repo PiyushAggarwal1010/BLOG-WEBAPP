@@ -5,6 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 import Header from './Header';
 import toast from 'react-hot-toast';
 import { FaHeart } from "react-icons/fa";
+import Loader from './Loader';
 
 const PostDetails = () => {
     const { id } = useParams();
@@ -174,7 +175,7 @@ const PostDetails = () => {
         getComments();
     }, [id])
 
-    if (loading) return <p className="text-center mt-10">Loading...</p>;
+    if (loading) return <Loader />;
     if (!post) return null;
     const isOwner = user?._id === post.author?._id;
 
