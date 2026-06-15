@@ -1,5 +1,6 @@
 const postModel = require("../models/post_model");
 const config = require('../config/config')
+const cloudinary = require("../config/cloudinary");
 
 const createPost = async (req, res) => {
     try {
@@ -10,13 +11,17 @@ const createPost = async (req, res) => {
             })
         }
         const imageUrl = req.file ? req.file.path : null;
+        const imagePublicId = req.file ? req.file.filename : "";
 
         const author = req.user.id;
         const post = await postModel.create({
             title,
             content,
             author,
-            image: imageUrl
+            image: {
+                url: imageUrl,
+                public_id: imagePublicId
+            }
         })
         return res.status(201).json({
             message: "post created successfully",
@@ -79,6 +84,10 @@ const deleteMyPost = async (req, res) => {
                 message: "Not authorized to delete this post"
             })
         }
+        if (post.image?.public_id) {
+            await cloudinary.uploader.destroy(post.image.public_id);
+        }
+        
         await post.deleteOne();
         res.status(200).json({
             message: "post deleted successfully"

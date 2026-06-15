@@ -5,9 +5,9 @@ const Card = ({ data }) => {
   return (
     <Link to={`/post/${data._id}`} className="block h-full">
       <div className="bg-white text-stone-800 rounded-xl p-6 border-2 shadow-sm border-stone-200 hover:shadow-md hover:border-stone-300 transition-all h-full flex flex-col">
-        {data.image && (
+        {data.image?.url && (
           <img
-            src={data.image}
+            src={data.image.url}
             alt="post"
             className="w-full h-40 object-cover rounded-xl mb-3"
           />

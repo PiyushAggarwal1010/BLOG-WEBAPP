@@ -55,6 +55,7 @@ const PostDetails = () => {
 
     const handleDelete = async () => {
         try {
+            setLoading(true)
             const token = localStorage.getItem("token");
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
                 method: "DELETE",
@@ -68,6 +69,8 @@ const PostDetails = () => {
             navigate(-1);
         } catch (error) {
             toast.error(error.message || "Could not delete post");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -260,10 +263,10 @@ const PostDetails = () => {
                                 </div>
                             )}
                         </div>
-                        
-                        {post.image && (
+
+                        {post.image?.url && (
                             <img
-                                src={post.image}
+                                src={post.image.url}
                                 alt="post"
                                 className="w-full h-64 md:h-80 object-cover rounded-xl mt-5 mb-5"
                             />
