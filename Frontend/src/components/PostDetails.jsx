@@ -268,7 +268,7 @@ const PostDetails = () => {
                             <img
                                 src={post.image.url}
                                 alt="post"
-                                className="w-full h-64 md:h-80 object-cover rounded-xl mt-5 mb-5"
+                                className="w-full h-64 md:h-80 object-contain bg-stone-100 rounded-xl mt-5 mb-5"
                             />
                         )}
 
