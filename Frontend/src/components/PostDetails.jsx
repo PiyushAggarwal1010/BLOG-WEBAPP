@@ -234,10 +234,9 @@ const PostDetails = () => {
                             {post.title}
                         </h1>
 
-                        <div className="flex flex-wrap justify-between items-center border-b border-stone-100 pb-6 mb-8 gap-4">
+                        <div className="flex flex-wrap justify-between items-center border-b border-stone-100 pb-6 mb-5 gap-4">
                             <div className="flex flex-col">
-                                <span className="text-stone-400 text-sm uppercase tracking-widest font-semibold">Author</span>
-                                <span className="text-stone-800 font-medium">{post.author.username}</span>
+                                <span className="text-stone-400 text-sm uppercase tracking-widest font-semibold">By- {post.author.username}</span>
                             </div>
 
                             {isOwner && (
@@ -261,8 +260,16 @@ const PostDetails = () => {
                                 </div>
                             )}
                         </div>
+                        
+                        {post.image && (
+                            <img
+                                src={post.image}
+                                alt="post"
+                                className="w-full h-64 md:h-80 object-cover rounded-xl mt-5 mb-5"
+                            />
+                        )}
 
-                        <div className="text-stone-700 leading-loose whitespace-pre-wrap text-lg md:text-xl wrap-break-word font-serif">
+                        <div className="text-base md:text-lg leading-relaxed text-stone-700 whitespace-pre-wrap">
                             {post.content}
                         </div>
 

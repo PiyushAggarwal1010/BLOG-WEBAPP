@@ -5,12 +5,30 @@ import { useNavigate } from 'react-router-dom';
 const AddPost = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [preview, setPreview] = useState(null);
     const navigate = useNavigate();
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setImage(file);
+
+        if (file) {
+            setPreview(URL.createObjectURL(file));
+        }
+    };
 
     const PostBlog = async (e) => {
         e.preventDefault();
         setLoading(true);
+        const formData = new FormData()
+        formData.append("title", title);
+        formData.append("content", content);
+
+        if (image) {
+            formData.append("image", image);
+        }
         try {
             const token = localStorage.getItem("token");
             if (!title || !content) {
@@ -24,10 +42,9 @@ const AddPost = () => {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify(postData)
+                body: formData
             });
 
             if (!res.ok) {
@@ -69,6 +86,70 @@ const AddPost = () => {
                         placeholder="Enter the title here..."
                         className="w-full px-4 py-3 bg-stone-50 text-stone-900 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all font-semibold text-lg placeholder-stone-400"
                     />
+                </div>
+                
+                <div className="mb-6">
+                    <label className="block text-stone-500 font-medium mb-2 text-sm uppercase tracking-wide">
+                        Featured Image
+                    </label>
+
+                    <div className="border border-dashed border-stone-300 bg-stone-50 rounded-xl p-6 text-center hover:border-stone-400 transition cursor-pointer">
+
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                            id="imageUpload"
+                        />
+
+                        <label htmlFor="imageUpload" className="cursor-pointer">
+                            <div className="flex flex-col items-center gap-2">
+                                <svg
+                                    className="w-10 h-10 text-stone-400"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={1.5}
+                                        d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"
+                                    />
+                                </svg>
+
+                                <p className="text-stone-600 font-medium">
+                                    Click to upload image
+                                </p>
+
+                                <p className="text-xs text-stone-400">
+                                    PNG, JPG, WEBP up to 5MB
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+
+                    {preview && (
+                        <div className="mt-4 relative">
+                            <img
+                                src={preview}
+                                alt="preview"
+                                className="w-full h-48 object-cover rounded-xl border border-stone-200 shadow-sm"
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setImage(null);
+                                    setPreview(null);
+                                }}
+                                className="absolute top-2 right-2 bg-white/90 text-stone-700 px-3 py-1 rounded-full text-xs hover:bg-white shadow"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mb-8">

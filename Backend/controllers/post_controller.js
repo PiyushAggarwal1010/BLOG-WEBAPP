@@ -9,11 +9,14 @@ const createPost = async (req, res) => {
                 message: "title and content is required"
             })
         }
+        const imageUrl = req.file ? req.file.path : null;
+
         const author = req.user.id;
         const post = await postModel.create({
             title,
             content,
             author,
+            image: imageUrl
         })
         return res.status(201).json({
             message: "post created successfully",
