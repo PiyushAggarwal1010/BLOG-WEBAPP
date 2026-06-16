@@ -10,6 +10,11 @@ const Dashboard = () => {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [posts, updatePosts] = useState([]);
+  const [stats, setStats] = useState({
+    totalPosts: 0,
+    totalLikes: 0,
+    totalComments: 0,
+  });
 
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q') || '';
@@ -23,19 +28,24 @@ const Dashboard = () => {
           setLoading(false);
           return;
         }
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/my-posts`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (!res.ok) {
+        const [postsRes, statsRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/posts/my-posts`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/posts/user/stats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+        console.log(postsRes.status, statsRes.status);
+        if (!postsRes.ok) {
           throw new Error("Failed to fetch posts");
         }
 
-        const result = await res.json();
-        updatePosts(result.posts);
+        const postsData = await postsRes.json();
+        const statsData = await statsRes.json();
+
+        updatePosts(postsData.posts);
+        setStats(statsData);
 
       } catch (error) {
         console.log("error while fetching the posts");
@@ -61,11 +71,43 @@ const Dashboard = () => {
       <Header />
 
       <div className="max-w-7xl mx-auto p-6 md:p-8">
-        <div className="mb-10 pb-6 border-b border-stone-200">
-          <h1 className="text-3xl md:text-4xl font-black text-stone-900 tracking-tight pb-1.5">
-            Welcome, {user?.username}
-          </h1>
-          <p className="text-stone-500 mt-2 text-lg">Manage your published posts below.</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+
+          <div className="flex items-center gap-4">
+
+            <div className="w-15 h-15 rounded-full bg-stone-300 cursor-pointer flex items-center justify-center font-semibold text-2xl">
+              {user?.username?.charAt(0).toUpperCase()}
+            </div>
+
+            <div>
+              <h2 className="text-xl font-bold text-stone-900">
+                {user?.username}
+              </h2>
+              <p className="text-sm text-stone-500">
+                {user?.email}
+              </p>
+            </div>
+
+          </div>
+
+          <div className="flex gap-8 text-center">
+
+            <div>
+              <p className="text-lg font-bold">{stats.totalPosts}</p>
+              <p className="text-xs text-stone-500">Posts</p>
+            </div>
+
+            <div>
+              <p className="text-lg font-bold">{stats.totalLikes}</p>
+              <p className="text-xs text-stone-500">Likes</p>
+            </div>
+
+            <div>
+              <p className="text-lg font-bold">{stats.totalComments}</p>
+              <p className="text-xs text-stone-500">Comments</p>
+            </div>
+
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

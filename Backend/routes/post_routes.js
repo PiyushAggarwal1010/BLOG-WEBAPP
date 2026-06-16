@@ -11,5 +11,6 @@ router.delete('/:id',authMiddleware,postController.deleteMyPost);
 router.patch('/:id',authMiddleware,postController.updateMyPost);
 router.get('/:id',authMiddleware, postController.getSinglePost);
 router.post('/:id/like', authMiddleware,postController.handleLikes);
+router.get('/user/stats',authMiddleware, postController.getUserStats);
 
 module.exports=router;

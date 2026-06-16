@@ -32,6 +32,10 @@ const postSchema = new mongoose.Schema({
     likesCount: {
         type: Number,
         default: 0
+    },
+    commentsCount: {
+        type: Number,
+        default: 0
     }
 },
     {

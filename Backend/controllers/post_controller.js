@@ -87,7 +87,7 @@ const deleteMyPost = async (req, res) => {
         if (post.image?.public_id) {
             await cloudinary.uploader.destroy(post.image.public_id);
         }
-        
+
         await post.deleteOne();
         res.status(200).json({
             message: "post deleted successfully"
@@ -205,4 +205,29 @@ const handleLikes = async (req, res) => {
     }
 }
 
-module.exports = { createPost, getAllPosts, getMyPosts, deleteMyPost, updateMyPost, getSinglePost, handleLikes };
+const getUserStats = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+
+        const totalPosts = await postModel.countDocuments({ author:userId });
+        const userPosts = await postModel.find({ author:userId });
+
+        let totalLikes = 0;
+        let totalComments = 0;
+        userPosts.forEach(post => {
+            totalLikes += post.likesCount;
+            totalComments += post.commentsCount;
+        });
+
+        res.json({
+            totalPosts,
+            totalComments,
+            totalLikes,
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching stats" });
+    }
+};
+
+module.exports = { createPost, getAllPosts, getMyPosts, deleteMyPost, updateMyPost, getSinglePost, handleLikes, getUserStats };
