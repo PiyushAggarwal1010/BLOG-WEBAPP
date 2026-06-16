@@ -1,4 +1,5 @@
 const postModel = require("../models/post_model");
+const commentModel = require("../models/comment_model");
 const config = require('../config/config')
 const cloudinary = require("../config/cloudinary");
 
@@ -87,6 +88,8 @@ const deleteMyPost = async (req, res) => {
         if (post.image?.public_id) {
             await cloudinary.uploader.destroy(post.image.public_id);
         }
+
+        await commentModel.deleteMany({postId})
 
         await post.deleteOne();
         res.status(200).json({
