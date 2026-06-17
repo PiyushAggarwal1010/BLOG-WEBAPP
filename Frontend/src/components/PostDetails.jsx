@@ -272,7 +272,7 @@ const PostDetails = () => {
                             />
                         )}
 
-                        <div className="text-base md:text-lg leading-relaxed text-stone-700 whitespace-pre-wrap">
+                        <div className="text-base md:text-lg leading-relaxed text-stone-700 whitespace-pre-wrap wrap-break-word">
                             {post.content}
                         </div>
 

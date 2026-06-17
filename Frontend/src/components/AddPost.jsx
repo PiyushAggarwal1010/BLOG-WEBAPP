@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import toast from "react-hot-toast";
 import { useNavigate } from 'react-router-dom';
+import { FaUpload } from 'react-icons/fa';
 
 const AddPost = () => {
     const [title, setTitle] = useState("");
@@ -105,19 +106,7 @@ const AddPost = () => {
 
                         <label htmlFor="imageUpload" className="cursor-pointer">
                             <div className="flex flex-col items-center gap-2">
-                                <svg
-                                    className="w-10 h-10 text-stone-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={1.5}
-                                        d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"
-                                    />
-                                </svg>
+                                <FaUpload className='text-stone-400 text-3xl' /> 
 
                                 <p className="text-stone-600 font-medium">
                                     Click to upload image

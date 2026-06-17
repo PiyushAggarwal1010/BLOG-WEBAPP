@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/BlOGIFY-LOGO.png"
+import { FaSearch } from 'react-icons/fa';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -60,10 +61,8 @@ const Header = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="bg-transparent text-sm text-stone-800 placeholder-stone-500 focus:outline-none w-full"
                     />
-                    <button type="submit" onClick={handleSearch} className="text-stone-400 hover:text-stone-700 pl-2 cursor-pointer transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                        </svg>
+                    <button type="submit" onClick={handleSearch} className="text-stone-400 hover:text-stone-600 pl-2 cursor-pointer transition-colors">
+                        <FaSearch />
                     </button>
                 </form>
 
