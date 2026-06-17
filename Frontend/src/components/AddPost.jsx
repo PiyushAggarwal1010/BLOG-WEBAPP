@@ -40,20 +40,18 @@ const AddPost = () => {
                 title,
                 content
             }
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
                 body: formData
             });
-
-            if (!res.ok) {
+            const res=await response.json();
+            if (!response.ok) {
                 setLoading(false);
-                throw new Error("Failed to create post");
+                throw new Error(res.message);
             }
-
-            console.log(res);
             toast.success("Post created!");
             navigate('/');
         } catch (error) {
