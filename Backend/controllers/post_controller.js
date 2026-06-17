@@ -2,6 +2,7 @@ const postModel = require("../models/post_model");
 const commentModel = require("../models/comment_model");
 const config = require('../config/config')
 const cloudinary = require("../config/cloudinary");
+const mongoose = require('mongoose');
 
 const createPost = async (req, res) => {
     try {
@@ -89,7 +90,7 @@ const deleteMyPost = async (req, res) => {
             await cloudinary.uploader.destroy(post.image.public_id);
         }
 
-        await commentModel.deleteMany({postId})
+        await commentModel.deleteMany({ postId })
 
         await post.deleteOne();
         res.status(200).json({
@@ -212,8 +213,8 @@ const getUserStats = async (req, res) => {
     try {
         const userId = req.user?.id;
 
-        const totalPosts = await postModel.countDocuments({ author:userId });
-        const userPosts = await postModel.find({ author:userId });
+        const totalPosts = await postModel.countDocuments({ author: userId });
+        const userPosts = await postModel.find({ author: userId });
 
         let totalLikes = 0;
         let totalComments = 0;
@@ -233,4 +234,38 @@ const getUserStats = async (req, res) => {
     }
 };
 
-module.exports = { createPost, getAllPosts, getMyPosts, deleteMyPost, updateMyPost, getSinglePost, handleLikes, getUserStats };
+const getPosts = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 8;
+        if (limit > 48) limit = 48;
+        const cursor = req.query.cursor;
+
+        let query = {};
+
+        if (cursor) {
+            if (!mongoose.isValidObjectId(cursor)) {
+                return res.status(400).json({ message: "Invalid cursor format" });
+            }
+            query._id = { $lt: new mongoose.Types.ObjectId(cursor) };
+        }
+
+        const posts = await postModel.find(query)
+            .sort({ _id: -1 })
+            .limit(limit+1); //+1 for checking next page
+
+        const hasNextPage = posts.length > limit;
+        if (hasNextPage) {
+            posts.pop(); 
+        }
+
+        res.json({
+            posts,
+            nextCursor: hasNextPage ? posts[posts.length - 1]._id : null
+        });
+
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching posts" });
+    }
+};
+
+module.exports = { createPost, getAllPosts, getMyPosts, deleteMyPost, updateMyPost, getSinglePost, handleLikes, getUserStats, getPosts };

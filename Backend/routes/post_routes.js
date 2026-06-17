@@ -7,12 +7,13 @@ const upload = require("../middleware/upload_middleware");
 const validateSchema=require("../validators/post_validators")
 
 router.post('/',authMiddleware,upload.single("image"),validateMiddleware(validateSchema.postSchema),postController.createPost);
-router.get('/',postController.getAllPosts);
+router.get('/all',postController.getAllPosts);
 router.get('/my-posts',authMiddleware, postController.getMyPosts);
 router.delete('/:id',authMiddleware,postController.deleteMyPost);
 router.patch('/:id',authMiddleware,validateMiddleware(validateSchema.postSchema),postController.updateMyPost);
 router.get('/:id',authMiddleware, postController.getSinglePost);
 router.post('/:id/like', authMiddleware,postController.handleLikes);
 router.get('/user/stats',authMiddleware, postController.getUserStats);
+router.get('/',postController.getPosts);
 
 module.exports=router;

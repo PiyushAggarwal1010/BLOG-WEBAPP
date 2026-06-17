@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import Card from './Card';
 import Header from './Header';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -6,15 +6,17 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import Loader from './Loader';
+import { usePosts } from '../hooks/usePosts';
+
 
 const Home = () => {
-    const [posts, updatePosts] = useState([]);
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { isLoggedIn } = useContext(AuthContext);
 
     const [searchParams] = useSearchParams();
     const searchQuery = searchParams.get('q') || '';
+
+    const loadMoreRef = useRef();
 
     const CreateNewPost = () => {
         if (isLoggedIn) {
@@ -24,28 +26,37 @@ const Home = () => {
         }
     }
 
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading
+    } = usePosts();
+
+    const posts = data?.pages.flatMap((page) => page.posts) || [];
+
     useEffect(() => {
-        const getPosts = async () => {
-            try {
-                setLoading(true);
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/`);
-                const result = await res.json();
-                updatePosts(result.posts);
-            } catch (error) {
-                toast.error("Error while fetching the posts")
-            } finally {
-                setLoading(false);
+        const target = loadMoreRef.current;
+        if (!target) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasNextPage) {
+                fetchNextPage();
             }
-        };
-        getPosts();
-    }, []);
+        });
+
+        if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+
+        return () => observer.disconnect();
+    }, [hasNextPage, fetchNextPage]);
 
     const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    
-    if(loading){
+
+    if (isLoading) {
         return <Loader />
     }
     return (
@@ -78,6 +89,14 @@ const Home = () => {
             >
                 <span className="text-xl leading-none mb-0.5">+</span> Add Post
             </button>
+
+            <div ref={loadMoreRef} className="w-full flex justify-center items-center py-12">
+                {isFetchingNextPage ? (
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
+                ) : (
+                    hasNextPage && <p className="text-stone-400 text-sm font-medium">Scroll down for more</p>
+                )}
+            </div>
         </div>
     )
 }
