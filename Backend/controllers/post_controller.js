@@ -236,11 +236,19 @@ const getUserStats = async (req, res) => {
 
 const getPosts = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 8;
+        let limit = parseInt(req.query.limit) || 8;
         if (limit > 48) limit = 48;
         const cursor = req.query.cursor;
+        const search = req.query.search;
 
         let query = {};
+
+        if (search) {
+            query.$or = [
+                { title: { $regex: search, $options: "i" } },
+                { content: { $regex: search, $options: "i" } }
+            ];
+        }
 
         if (cursor) {
             if (!mongoose.isValidObjectId(cursor)) {
@@ -251,11 +259,12 @@ const getPosts = async (req, res) => {
 
         const posts = await postModel.find(query)
             .sort({ _id: -1 })
-            .limit(limit+1); //+1 for checking next page
+            .populate('author', 'username')
+            .limit(limit + 1); //+1 for checking next page
 
         const hasNextPage = posts.length > limit;
         if (hasNextPage) {
-            posts.pop(); 
+            posts.pop();
         }
 
         res.json({

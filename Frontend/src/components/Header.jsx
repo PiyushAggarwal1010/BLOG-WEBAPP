@@ -1,18 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/BlOGIFY-LOGO.png"
 import { FaSearch } from 'react-icons/fa';
+import { useDebounce } from "../hooks/useDebounce";
 
 const Header = () => {
     const navigate = useNavigate();
     const { isLoggedIn, user, logout, loading } = useContext(AuthContext);
     const [showConfirm, setShowConfirm] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('')
     const [open, setOpen] = useState(false);
-    const location = useLocation();
     const dropdownRef = useRef();
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchQuery, setSearchQuery] = useState(
+        searchParams.get("q") || ''
+    );
+
+    const debouncedSearch = useDebounce(searchQuery, 300);
 
     //to close dropdown on clicking anywhere outside it
     useEffect(() => {
@@ -28,32 +34,36 @@ const Header = () => {
         }
     }, [])
 
-    if (loading) return null;
-
     const handleLogout = () => {
         logout();
         navigate('/login');
         return;
     }
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
+    useEffect(() => {
+        const currentQuery = searchParams.get("q") || "";
+        if (debouncedSearch === currentQuery) return;
 
-        if (!searchQuery.trim()) {
-            navigate(`${location.pathname}`);
-            return;
+        const params = new URLSearchParams(searchParams);
+
+        if (!debouncedSearch.trim()) {
+            params.delete("q");
+        } else {
+            params.set("q", debouncedSearch);
         }
-        navigate(`${location.pathname}/?q=${encodeURIComponent(searchQuery)}`);
-    }
 
+        setSearchParams(params, { replace: true });
+    }, [debouncedSearch, searchParams]);
 
+    if (loading) return null;
+    
     return (
         <header className="bg-white border-b border-stone-200 sticky top-0 z-10">
             <div className="max-w-7xl mx-auto px-4 py-2 flex flex-col sm:flex-row gap-4 items-center justify-between">
 
                 <img src={logo} alt="Blog App" className='h-15 w-auto object-contain' />
 
-                <form onSubmit={handleSearch} className="flex items-center bg-stone-100 rounded-full px-4 py-2.5 w-full sm:w-95 border border-transparent focus-within:border-stone-300 focus-within:bg-white transition-all">
+                <div className="flex items-center bg-stone-100 rounded-full px-4 py-2.5 w-full sm:w-95 border border-transparent focus-within:border-stone-300 focus-within:bg-white transition-all">
                     <input
                         type="text"
                         placeholder="Search posts..."
@@ -61,10 +71,9 @@ const Header = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="bg-transparent text-sm text-stone-800 placeholder-stone-500 focus:outline-none w-full"
                     />
-                    <button type="submit" onClick={handleSearch} className="text-stone-400 hover:text-stone-600 pl-2 cursor-pointer transition-colors">
-                        <FaSearch />
-                    </button>
-                </form>
+
+                    <FaSearch className="text-stone-400 hover:text-stone-600 pl-2 cursor-pointer transition-colors text-2xl" />
+                </div>
 
                 <nav className="flex gap-6 items-center text-md font-medium">
                     <Link to="/" className="text-stone-600 hover:text-stone-900 transition-colors">Home</Link>

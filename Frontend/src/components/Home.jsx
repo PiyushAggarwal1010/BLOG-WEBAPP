@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from './Card';
 import Header from './Header';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { AuthContext } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import Loader from './Loader';
 import { usePosts } from '../hooks/usePosts';
-
+import { useInView } from 'react-intersection-observer';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -16,7 +16,9 @@ const Home = () => {
     const [searchParams] = useSearchParams();
     const searchQuery = searchParams.get('q') || '';
 
-    const loadMoreRef = useRef();
+    const { ref, inView } = useInView({
+        rootMargin: "100px",
+    });
 
     const CreateNewPost = () => {
         if (isLoggedIn) {
@@ -32,33 +34,16 @@ const Home = () => {
         hasNextPage,
         isFetchingNextPage,
         isLoading
-    } = usePosts();
+    } = usePosts(searchQuery);
 
     const posts = data?.pages.flatMap((page) => page.posts) || [];
 
     useEffect(() => {
-        const target = loadMoreRef.current;
-        if (!target) return;
+        if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+        }
+    }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting && hasNextPage) {
-                fetchNextPage();
-            }
-        });
-
-        if (loadMoreRef.current) observer.observe(loadMoreRef.current);
-
-        return () => observer.disconnect();
-    }, [hasNextPage, fetchNextPage]);
-
-    const filteredPosts = posts.filter(post =>
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    if (isLoading) {
-        return <Loader />
-    }
     return (
         <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">
             <Header />
@@ -69,18 +54,21 @@ const Home = () => {
                         Showing results for: <span className="text-stone-900 font-semibold">"{searchQuery}"</span>
                     </h2>
                 )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredPosts.length > 0 ? (
-                        filteredPosts.map((post) => (
-                            <Card key={post._id} data={post} />
-                        ))
-                    ) : (
-                        <p className="text-stone-500 col-span-full text-center py-16 text-lg">
-                            No posts found.
-                        </p>
-                    )}
-                </div>
+                {isLoading ? (
+                    <Loader />
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {posts.length > 0 ? (
+                            posts.map((post) => (
+                                <Card key={post._id} data={post} />
+                            ))
+                        ) : (
+                            <p className="text-stone-500 col-span-full text-center py-16 text-lg">
+                                No posts found.
+                            </p>
+                        )}
+                    </div>
+                )}
             </div>
 
             <button
@@ -90,13 +78,15 @@ const Home = () => {
                 <span className="text-xl leading-none mb-0.5">+</span> Add Post
             </button>
 
-            <div ref={loadMoreRef} className="w-full flex justify-center items-center py-12">
-                {isFetchingNextPage ? (
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
-                ) : (
-                    hasNextPage && <p className="text-stone-400 text-sm font-medium">Scroll down for more</p>
-                )}
-            </div>
+            {!isLoading && hasNextPage && (
+                <div ref={ref} className="w-full flex justify-center items-center py-12">
+                    {isFetchingNextPage ? (
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
+                    ) : (
+                        <p className="text-stone-400 text-sm font-medium">Scroll down for more</p>
+                    )}
+                </div>
+            )}
         </div>
     )
 }
