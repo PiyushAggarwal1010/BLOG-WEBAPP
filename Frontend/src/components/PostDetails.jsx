@@ -6,6 +6,7 @@ import Header from './Header';
 import toast from 'react-hot-toast';
 import { FaHeart } from "react-icons/fa";
 import Loader from './Loader';
+import ConfirmModal from './ConfirmModal';
 
 const PostDetails = () => {
     const { id } = useParams();
@@ -24,6 +25,8 @@ const PostDetails = () => {
 
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
+    const [isCommenting, setIsCommenting] = useState(false);
+    const [commentToDelete, setCommentToDelete] = useState(null);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -128,6 +131,7 @@ const PostDetails = () => {
         }
 
         try {
+            setIsCommenting(true);
             const token = localStorage.getItem("token");
             const commentData = {
                 postId: id,
@@ -147,11 +151,31 @@ const PostDetails = () => {
             if (!res.ok) {
                 throw new Error(data.message || "Failed to comment on post");
             }
-            console.log(data);
             setComments((prev) => [data.comm, ...prev]);
             setNewComment("");
         } catch (error) {
             toast.error(error.message);
+        } finally {
+            setIsCommenting(false);
+        }
+    }
+
+    const handleDeleteComment = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/comment/${commentToDelete}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (!res.ok) throw new Error("Failed to delete comment");
+            setComments(prevComments => prevComments.filter(comment => comment._id !== commentToDelete));
+            toast.success("Comment deleted successfully");
+        } catch (error) {
+            toast.error(error.message)
+        } finally {
+            setCommentToDelete(null);
         }
     }
 
@@ -306,6 +330,7 @@ const PostDetails = () => {
                                 <div className="flex justify-end mt-3">
                                     <button
                                         onClick={addComment}
+                                        disabled={isCommenting}
                                         className="bg-stone-900 hover:bg-stone-800 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-sm">
                                         Add Comment
                                     </button>
@@ -337,6 +362,16 @@ const PostDetails = () => {
                                                     <p className="block w-full text-sm text-stone-600 leading-relaxed wrap-break-word whitespace-pre-wrap">
                                                         {c.content}
                                                     </p>
+                                                    {user?._id === c.userId._id && (
+                                                        <div className="flex justify-end mt-2">
+                                                            <button
+                                                                onClick={() => setCommentToDelete(c._id)}
+                                                                className="text-rose-500 hover:text-rose-700 text-xs font-medium px-2 py-1 rounded hover:bg-rose-50 transition-colors"
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}
@@ -348,34 +383,25 @@ const PostDetails = () => {
                     </article>
                 )}
             </div>
-            {showConfirm && (
-                <div className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-                    <div className="bg-white text-stone-800 p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-auto transform transition-all">
-                        <h3 className="text-xl font-bold mb-2 text-stone-900 text-center">Delete Post?</h3>
-                        <p className="mb-8 text-center text-stone-500 leading-relaxed">
-                            Are you sure you want to permanently delete this post?
-                        </p>
 
-                        <div className="flex flex-col sm:flex-row justify-center gap-3">
-                            <button
-                                onClick={() => setShowConfirm(false)}
-                                className="w-full sm:w-auto bg-stone-100 text-stone-700 px-6 py-2.5 rounded-full font-medium hover:bg-stone-200 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setShowConfirm(false);
-                                    handleDelete();
-                                }}
-                                className="w-full sm:w-auto bg-rose-600 text-white px-6 py-2.5 rounded-full font-medium hover:bg-rose-700 transition-colors shadow-sm"
-                            >
-                                Yes, delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                isOpen={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={() => {
+                    setShowConfirm(false);
+                    handleDelete();
+                }}
+                title="Delete Post?"
+                message="Are you sure you want to permanently delete this post?"
+            />
+
+            <ConfirmModal
+                isOpen={commentToDelete !== null}
+                onClose={() => setCommentToDelete(null)}
+                onConfirm={handleDeleteComment}
+                title="Delete Comment?"
+                message="Are you sure you want to permanently delete this comment?"
+            />
         </div>
     );
 }

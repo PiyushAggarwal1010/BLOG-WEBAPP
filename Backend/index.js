@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use('/api/auth',auth_router);
 app.use('/api/posts',post_router);
-app.use('/api/posts',comment_router);
+app.use('/api',comment_router);
 
 app.get('/', (req, res) => {
   res.send('Server Running');

@@ -11,7 +11,7 @@ const AddComment = async (req, res) => {
         if (!content) {
             return res.status(400).json({ message: "Content is required" });
         }
-            
+
         const post = await postModel.findById(postId);
         if (!post) {
             return res.status(404).json({ message: "Post not found" });
@@ -57,4 +57,34 @@ const getAllComments = async (req, res) => {
     }
 }
 
-module.exports = { AddComment, getAllComments };
+const deleteComment = async (req, res) => {
+    try {
+        const commentId = req.params.id;
+        const comment = await commentModel.findById(commentId);
+        if (!comment) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+        const userId = req.user.id;
+
+        if (!comment.userId.equals(userId)) {
+            return res.status(403).json({ message: "Unauthorized to delete this comment" })
+        }
+
+        const postId = comment.postId;
+
+        await commentModel.findByIdAndDelete(commentId);
+
+        await postModel.findByIdAndUpdate(postId, {
+            $inc: { commentsCount: -1 }
+        });
+        return res.status(200).json({
+            message: "Comment deleted successfully"
+        })
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+module.exports = { AddComment, getAllComments, deleteComment };
