@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { FaHeart } from "react-icons/fa";
 import Loader from './Loader';
 import ConfirmModal from './ConfirmModal';
+import ReactMarkdown from "react-markdown";
 
 const PostDetails = () => {
     const { id } = useParams();
@@ -296,8 +297,10 @@ const PostDetails = () => {
                             />
                         )}
 
-                        <div className="text-base md:text-lg leading-relaxed text-stone-700 whitespace-pre-wrap wrap-break-word">
-                            {post.content}
+                        <div className="prose prose-stone max-w-none prose-img:rounded-xl prose-a:text-rose-600 hover:prose-a:text-rose-500">
+                            <ReactMarkdown>
+                                {post.content}
+                            </ReactMarkdown>
                         </div>
 
                         {/* likes */}

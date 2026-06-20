@@ -145,7 +145,7 @@ const AddPost = () => {
                     </label>
                     <textarea
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="Write your story here..."
+                        placeholder="Write your story here... (Markdown Supported)"
                         rows="8"
                         className="w-full px-4 py-3 bg-stone-50 text-stone-800 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all whitespace-pre-wrap leading-relaxed placeholder-stone-400"
                     />
