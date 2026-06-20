@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import toast from "react-hot-toast";
 import { useNavigate } from 'react-router-dom';
 import { FaUpload } from 'react-icons/fa';
+import ReactMarkdown from 'react-markdown';
 
 const AddPost = () => {
     const [title, setTitle] = useState("");
@@ -10,6 +11,7 @@ const AddPost = () => {
     const [loading, setLoading] = useState(false);
     const [preview, setPreview] = useState(null);
     const navigate = useNavigate();
+    const [isPreviewingPost,setIsPreviewingPost]=useState(false);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -22,6 +24,12 @@ const AddPost = () => {
 
     const PostBlog = async (e) => {
         e.preventDefault();
+        
+        if (!title.trim() || !content.trim()) {
+                toast.error("Title and Content are required");
+                return;
+        }
+
         setLoading(true);
         const formData = new FormData()
         formData.append("title", title);
@@ -32,14 +40,6 @@ const AddPost = () => {
         }
         try {
             const token = localStorage.getItem("token");
-            if (!title || !content) {
-                toast.error("Title and Content are required")
-                return;
-            }
-            const postData = {
-                title,
-                content
-            }
             const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
                 method: 'POST',
                 headers: {
@@ -49,7 +49,6 @@ const AddPost = () => {
             });
             const res=await response.json();
             if (!response.ok) {
-                setLoading(false);
                 throw new Error(res.message);
             }
             toast.success("Post created!");
@@ -64,7 +63,45 @@ const AddPost = () => {
 
     return (
         <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4 font-sans py-12">
-            <form
+            {isPreviewingPost ?
+                (
+                    <div className="bg-white w-full max-w-3xl p-8 md:p-12 rounded-2xl shadow-sm border border-stone-200">
+                    <div className="flex justify-between items-center mb-8 border-b border-stone-100 pb-6">
+                        <h2 className="text-sm font-bold text-stone-400 uppercase tracking-widest">
+                            Preview Mode
+                        </h2>
+                        <button
+                            onClick={() => setIsPreviewingPost(false)}
+                            className="px-5 py-2 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-full text-sm font-medium transition-colors"
+                        >
+                            Back to Edit
+                        </button>
+                    </div>
+
+                    <article>
+                        <h1 className="text-4xl md:text-5xl font-black mb-6 text-stone-900 leading-tight tracking-tight wrap-break-word">
+                            {title || "Untitled Post"}
+                        </h1>
+
+                        {preview && (
+                            <img
+                                src={preview}
+                                alt="preview"
+                                className="w-full h-64 md:h-80 object-contain bg-stone-100 rounded-xl mt-5 mb-8"
+                            />
+                        )}
+
+                        <div className="prose prose-stone max-w-none prose-img:rounded-xl prose-a:text-rose-600 hover:prose-a:text-rose-500 wrap-break-word">
+                            <ReactMarkdown>
+                                {content || "*No content written yet...*"}
+                            </ReactMarkdown>
+                        </div>
+                    </article>
+                </div>
+                ) 
+             :
+                (
+                    <form
                 onSubmit={PostBlog}
                 className="bg-white w-full max-w-2xl p-8 md:p-10 rounded-2xl shadow-sm border border-stone-200"
             >
@@ -82,6 +119,7 @@ const AddPost = () => {
                     <input
                         onChange={(e) => setTitle(e.target.value)}
                         type="text"
+                        value={title}
                         placeholder="Enter the title here..."
                         className="w-full px-4 py-3 bg-stone-50 text-stone-900 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all font-semibold text-lg placeholder-stone-400"
                     />
@@ -146,19 +184,27 @@ const AddPost = () => {
                     <textarea
                         onChange={(e) => setContent(e.target.value)}
                         placeholder="Write your story here... (Markdown Supported)"
+                        value={content}
                         rows="8"
                         className="w-full px-4 py-3 bg-stone-50 text-stone-800 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all whitespace-pre-wrap leading-relaxed placeholder-stone-400"
                     />
                 </div>
 
-                <div className="flex gap-4 items-center">
+                <div className="flex flex-wrap gap-4 items-center">
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        className="px-6 py-3 rounded-full text-stone-600 font-medium hover:bg-stone-100 transition-colors"
+                        className="px-6 py-3 rounded-full border border-stone-200 text-stone-700 font-medium hover:bg-stone-100 transition-colors"
                     >
                         Cancel
                     </button>
+                    <button
+                            type="button"
+                            onClick={() => setIsPreviewingPost(true)}
+                            className="px-6 py-3 rounded-full border border-stone-200 text-stone-700 font-medium hover:bg-stone-100 transition-colors"
+                        >
+                            Preview
+                        </button>
                     <button
                         type="submit"
                         disabled={loading}
@@ -168,6 +214,9 @@ const AddPost = () => {
                     </button>
                 </div>
             </form>
+                )
+            }
+            
         </div>
     )
 }
