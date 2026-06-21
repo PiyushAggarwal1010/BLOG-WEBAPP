@@ -36,7 +36,6 @@ const Dashboard = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-        console.log(postsRes.status, statsRes.status);
         if (!postsRes.ok) {
           throw new Error("Failed to fetch posts");
         }
@@ -48,7 +47,8 @@ const Dashboard = () => {
         setStats(statsData);
 
       } catch (error) {
-        console.log("error while fetching the posts");
+        console.error('Error fetching data:', error);
+        toast.error(error.message || "Error while fetching the posts");
       } finally {
         setLoading(false);
       }

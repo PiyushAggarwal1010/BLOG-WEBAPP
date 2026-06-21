@@ -10,8 +10,8 @@ const app = express();
 connectDB();
 
 const corsOptions={
-  origin:'http://localhost:5173',
-  method:"GET,POST,DELETE,PUT,PATCH",
+ origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
+  methods:"GET,POST,DELETE,PUT,PATCH",
   credentials: true
 }
 app.use(cors(corsOptions));
@@ -26,6 +26,8 @@ app.get('/', (req, res) => {
   res.send('Server Running');
 });
 
-app.listen(3000, () => {
-  console.log(`Server is running at http://localhost:3000`);
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
