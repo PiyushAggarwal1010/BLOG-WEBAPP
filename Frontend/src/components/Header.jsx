@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import logo from "../assets/BlOGIFY-LOGO.png"
+import logo from "../assets/BLOGIFY-LOGO.png"
 import { FaSearch } from 'react-icons/fa';
 import { useDebounce } from "../hooks/useDebounce";
 
