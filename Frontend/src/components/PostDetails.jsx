@@ -23,6 +23,7 @@ const PostDetails = () => {
     const [showConfirm, setShowConfirm] = useState(false);
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
+    const [isLiking, setIsLiking] = useState(false);
 
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
@@ -106,6 +107,21 @@ const PostDetails = () => {
     }
 
     const handleLike = async () => {
+
+        if (isLiking) return;
+
+        const prevLiked = liked;
+        const prevLikesCount = likesCount;
+
+        const newLiked = !prevLiked;
+        const newLikesCount = newLiked
+            ? prevLikesCount + 1
+            : prevLikesCount - 1;
+
+        setLiked(newLiked);
+        setLikesCount(newLikesCount);
+
+        setIsLiking(true);
         try {
             const token = localStorage.getItem("token");
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/like`, {
@@ -115,13 +131,15 @@ const PostDetails = () => {
                 }
             });
 
-            if (!res.ok) throw new Error("Failed to like post");
-            const data = await res.json();
-
-            setLiked(data.liked);
-            setLikesCount(data.likesCount);
+            if (!res.ok) {
+                throw new Error("Failed to like post");
+            }
         } catch (error) {
+            setLiked(prevLiked);
+            setLikesCount(prevLikesCount);
             toast.error(error.message);
+        } finally {
+            setIsLiking(false);
         }
     }
 
