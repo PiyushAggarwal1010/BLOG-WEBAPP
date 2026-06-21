@@ -276,7 +276,7 @@ const PostDetails = () => {
                     </form>
                 ) : (
                     <article>
-                        <h1 className="text-4xl md:text-5xl font-black mb-6 text-stone-900 leading-tight tracking-tight">
+                        <h1 className="text-4xl md:text-5xl font-black mb-6 text-stone-900 leading-tight tracking-tight wrap-break-word">
                             {post.title}
                         </h1>
 
