@@ -226,35 +226,35 @@ const PostDetails = () => {
     const isOwner = user?._id === post.author?._id;
 
     return (
-        <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">
+        <div className="bg-stone-50 dark:bg-stone-950 min-h-screen text-stone-800 dark:text-stone-200 font-sans transition-colors duration-300">
             <Header />
 
-            <div className="max-w-3xl mx-auto p-8 md:p-12 mt-8 md:mt-12 bg-white rounded-2xl shadow-sm border border-stone-200">
+            <div className="max-w-3xl mx-auto p-8 md:p-12 mt-8 md:mt-12 bg-white dark:bg-stone-900 rounded-2xl shadow-sm border border-stone-200 dark:border-stone-800 transition-colors">
                 {isEditing ? (
                     <form onSubmit={handleUpdate}>
                         <div className="mb-6">
-                            <label className="block text-stone-500 font-medium mb-2 text-sm uppercase tracking-wide">Edit Title</label>
+                            <label className="block text-stone-500 dark:text-stone-400 font-medium mb-2 text-sm uppercase tracking-wide">Edit Title</label>
                             <input
                                 type="text"
                                 value={editTitle}
                                 onChange={(e) => setEditTitle(e.target.value)}
-                                className="w-full px-4 py-3 bg-stone-50 text-stone-900 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all font-semibold text-lg"
+                                className="w-full px-4 py-3 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 border border-stone-200 dark:border-stone-800 rounded-xl focus:outline-none focus:ring-2 transition-all font-semibold text-lg placeholder-stone-400 dark:placeholder-stone-600"
                                 required
                             />
                         </div>
 
                         <div className="mb-8">
-                            <label className="block text-stone-500 font-medium mb-2 text-sm uppercase tracking-wide">Edit Content</label>
+                            <label className="block text-stone-500 dark:text-stone-400 font-medium mb-2 text-sm uppercase tracking-wide">Edit Content</label>
                             <textarea
                                 value={editContent}
                                 onChange={(e) => setEditContent(e.target.value)}
                                 rows="12"
-                                className="w-full px-4 py-3 bg-stone-50 text-stone-800 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 transition-all whitespace-pre-wrap leading-relaxed"
+                                className="w-full px-4 py-3 bg-stone-50 dark:bg-stone-950 text-stone-800 dark:text-stone-100 border border-stone-200 dark:border-stone-800 rounded-xl focus:outline-none focus:ring-2 transition-all whitespace-pre-wrap leading-relaxed placeholder-stone-400 dark:placeholder-stone-600"
                                 required
                             />
                         </div>
 
-                        <div className="flex gap-4 justify-end border-t border-stone-100 pt-6">
+                        <div className="flex gap-4 justify-end border-t border-stone-100 dark:border-stone-800 pt-6">
                             <button
                                 type="button"
                                 onClick={() => {
@@ -262,13 +262,13 @@ const PostDetails = () => {
                                     setEditTitle(post.title);
                                     setEditContent(post.content);
                                 }}
-                                className="px-6 py-2.5 rounded-full text-stone-600 font-medium hover:bg-stone-100 transition-colors"
+                                className="px-6 py-2.5 rounded-full text-stone-600 dark:text-stone-300 font-medium hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="bg-stone-900 hover:bg-stone-800 text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-md"
+                                className="bg-stone-900 dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-900 px-6 py-2.5 rounded-full font-medium transition-colors shadow-md"
                             >
                                 Save Changes
                             </button>
@@ -276,13 +276,13 @@ const PostDetails = () => {
                     </form>
                 ) : (
                     <article>
-                        <h1 className="text-4xl md:text-5xl font-black mb-6 text-stone-900 leading-tight tracking-tight wrap-break-word">
+                        <h1 className="text-4xl md:text-5xl font-black mb-6 text-stone-900 dark:text-white leading-tight tracking-tight wrap-break-word">
                             {post.title}
                         </h1>
 
-                        <div className="flex flex-wrap justify-between items-center border-b border-stone-100 pb-6 mb-5 gap-4">
+                        <div className="flex flex-wrap justify-between items-center border-b border-stone-100 dark:border-stone-800 pb-6 mb-5 gap-4">
                             <div className="flex flex-col">
-                                <span className="text-stone-400 text-sm uppercase tracking-widest font-semibold">By- {post.author.username}</span>
+                                <span className="text-stone-400 dark:text-stone-500 text-sm uppercase tracking-widest font-semibold">By- {post.author.username}</span>
                             </div>
 
                             {isOwner && (
@@ -293,13 +293,13 @@ const PostDetails = () => {
                                             setEditTitle(post.title);
                                             setIsEditing(true);
                                         }}
-                                        className="bg-stone-100 text-stone-700 hover:bg-stone-200 px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+                                        className="bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
                                     >
                                         Edit
                                     </button>
                                     <button
                                         onClick={() => setShowConfirm(true)}
-                                        className="bg-rose-50 text-rose-600 hover:bg-rose-100 px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
+                                        className="bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/50 px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
                                     >
                                         Delete
                                     </button>
@@ -311,11 +311,11 @@ const PostDetails = () => {
                             <img
                                 src={post.image.url}
                                 alt="post"
-                                className="w-full h-64 md:h-80 object-contain bg-stone-100 rounded-xl mt-5 mb-5"
+                                className="w-full h-64 md:h-80 object-contain bg-stone-100 dark:bg-stone-800 rounded-xl mt-5 mb-5 transition-colors"
                             />
                         )}
 
-                        <div className="prose prose-stone max-w-none prose-img:rounded-xl prose-a:text-rose-600 hover:prose-a:text-rose-500">
+                        <div className="prose prose-stone dark:prose-invert max-w-none prose-img:rounded-xl prose-a:text-rose-600 dark:prose-a:text-rose-400 hover:prose-a:text-rose-500 dark:hover:prose-a:text-rose-300">
                             <ReactMarkdown>
                                 {post.content}
                             </ReactMarkdown>
@@ -328,16 +328,16 @@ const PostDetails = () => {
                                 className={`text-xl cursor-pointer transition-all duration-200 
                                 ${liked
                                         ? "text-red-500 scale-110"
-                                        : "text-gray-400 hover:text-red-300 hover:scale-110"
+                                        : "text-gray-400 dark:text-stone-600 hover:text-red-300 dark:hover:text-red-400 hover:scale-110"
                                     }`}
                             >
                                 <FaHeart />
                             </button>
-                            <span className="text-sm text-stone-600" >{likesCount}</span>
+                            <span className="text-sm text-stone-600 dark:text-stone-400" >{likesCount}</span>
                         </div>
 
                         {/* Comments */}
-                        <div className="mt-12 border-t border-stone-100 pt-8">
+                        <div className="mt-12 border-t border-stone-100 dark:border-stone-800 pt-8 transition-colors">
 
                             <div className="mb-8">
                                 <textarea
@@ -345,49 +345,49 @@ const PostDetails = () => {
                                     onChange={(e) => setNewComment(e.target.value)}
                                     placeholder="Write a comment..."
                                     rows="3"
-                                    className="w-full px-4 py-3 bg-stone-50 text-stone-800 border border-stone-300 rounded-xl resize-none"
+                                    className="w-full px-4 py-3 bg-stone-50 dark:bg-stone-950 text-stone-800 dark:text-stone-100 border border-stone-300 dark:border-stone-700 rounded-xl resize-none focus:outline-none focus:ring-2 placeholder-stone-400 dark:placeholder-stone-500 transition-colors"
                                 />
 
                                 <div className="flex justify-end mt-3">
                                     <button
                                         onClick={addComment}
                                         disabled={isCommenting}
-                                        className="bg-stone-900 hover:bg-stone-800 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-sm">
+                                        className="bg-stone-900 dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-stone-900 px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-sm disabled:opacity-50">
                                         Add Comment
                                     </button>
                                 </div>
                             </div>
 
                             <div>
-                                <h2 className="text-sm uppercase tracking-widest text-stone-400 font-semibold mb-6">
+                                <h2 className="text-sm uppercase tracking-widest text-stone-400 dark:text-stone-500 font-semibold mb-6">
                                     Comments
                                 </h2>
 
                                 {comments.length === 0 ? (
-                                    <p className="text-stone-400 text-sm">No comments yet</p>
+                                    <p className="text-stone-400 dark:text-stone-500 text-sm">No comments yet</p>
                                 ) : (
                                     <div className="space-y-6">
                                         {comments.map((c) => (
-                                            <div key={c._id} className="border-b border-stone-200 pb-4">
+                                            <div key={c._id} className="border-b border-stone-200 dark:border-stone-800 pb-4 transition-colors">
 
                                                 <div className="flex items-center justify-between mb-1">
-                                                    <p className="text-sm font-medium text-stone-800">
+                                                    <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
                                                         {c.userId?.username || "User"}
                                                     </p>
-                                                    <p className="text-xs text-stone-400">
+                                                    <p className="text-xs text-stone-400 dark:text-stone-500">
                                                         {new Date(c.createdAt).toLocaleDateString()}
                                                     </p>
                                                 </div>
 
                                                 <div>
-                                                    <p className="block w-full text-sm text-stone-600 leading-relaxed wrap-break-word whitespace-pre-wrap">
+                                                    <p className="block w-full text-sm text-stone-600 dark:text-stone-300 leading-relaxed wrap-break-word whitespace-pre-wrap">
                                                         {c.content}
                                                     </p>
                                                     {user?._id === c.userId._id && (
                                                         <div className="flex justify-end mt-2">
                                                             <button
                                                                 onClick={() => setCommentToDelete(c._id)}
-                                                                className="text-rose-500 hover:text-rose-700 text-xs font-medium px-2 py-1 rounded hover:bg-rose-50 transition-colors"
+                                                                className="text-rose-500 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 text-xs font-medium px-2 py-1 rounded hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                                                             >
                                                                 Delete
                                                             </button>

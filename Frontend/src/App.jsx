@@ -1,6 +1,7 @@
 import './App.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from "react-hot-toast";
 import PostDetails from './components/PostDetails';
 import Dashboard from './components/Dashboard';
@@ -60,10 +61,12 @@ const router = createBrowserRouter(
 function App() {
   return (
     <>
-      <AuthProvider>
-        <Toaster />
-        <RouterProvider router={router} />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Toaster />
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </ThemeProvider>
     </>
   )
 }

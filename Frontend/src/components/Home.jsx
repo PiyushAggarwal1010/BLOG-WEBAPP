@@ -45,13 +45,13 @@ const Home = () => {
     }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     return (
-        <div className="bg-stone-50 min-h-screen text-stone-800 font-sans">
+        <div className="bg-stone-50 dark:bg-stone-950 min-h-screen text-stone-800 dark:text-stone-200 font-sans transition-colors">
             <Header />
 
             <div className="p-6 md:p-8 max-w-7xl mx-auto">
                 {searchQuery && (
-                    <h2 className="text-xl text-stone-600 mb-8 pb-4 border-b border-stone-200">
-                        Showing results for: <span className="text-stone-900 font-semibold">"{searchQuery}"</span>
+                    <h2 className="text-xl text-stone-600 dark:text-stone-400 mb-8 pb-4 border-b border-stone-200 dark:border-stone-800 transition-colors">
+                        Showing results for: <span className="text-stone-900 dark:text-white font-semibold">"{searchQuery}"</span>
                     </h2>
                 )}
                 {isLoading ? (
@@ -63,7 +63,7 @@ const Home = () => {
                                 <Card key={post._id} data={post} />
                             ))
                         ) : (
-                            <p className="text-stone-500 col-span-full text-center py-16 text-lg">
+                            <p className="text-stone-500 dark:text-stone-400 col-span-full text-center py-16 text-lg">
                                 No posts found.
                             </p>
                         )}
@@ -73,7 +73,7 @@ const Home = () => {
 
             <button
                 onClick={CreateNewPost}
-                className="fixed bottom-8 right-8 bg-stone-900 text-white px-6 py-3 rounded-full font-medium shadow-lg hover:bg-stone-800 hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                className="fixed bottom-8 right-8 bg-stone-900 dark:bg-white text-white dark:text-stone-900 px-6 py-3 rounded-full font-medium shadow-lg hover:bg-stone-800 dark:hover:bg-stone-200 hover:shadow-xl transition-all duration-200 flex items-center gap-2"
             >
                 <span className="text-xl leading-none mb-0.5">+</span> Add Post
             </button>
@@ -81,9 +81,9 @@ const Home = () => {
             {!isLoading && hasNextPage && (
                 <div ref={ref} className="w-full flex justify-center items-center py-12">
                     {isFetchingNextPage ? (
-                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-stone-900" />
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 dark:border-stone-700 border-t-stone-900 dark:border-t-white" />
                     ) : (
-                        <p className="text-stone-400 text-sm font-medium">Scroll down for more</p>
+                        <p className="text-stone-400 dark:text-stone-500 text-sm font-medium">Scroll down for more</p>
                     )}
                 </div>
             )}
