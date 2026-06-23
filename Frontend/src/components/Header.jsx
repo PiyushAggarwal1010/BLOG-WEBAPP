@@ -41,10 +41,14 @@ const Header = () => {
         }
     }, [])
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-        return;
+    async function handleLogout(){
+        try {
+            await logout();
+            navigate('/login');
+            return;
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     useEffect(() => {

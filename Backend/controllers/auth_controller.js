@@ -32,10 +32,16 @@ const register = async (req, res) => {
             expiresIn: '2d'
         })
 
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 2 * 24 * 60 * 60 * 1000 // 2 days
+        });
+
         res.status(201).json({
             message: 'user created succesfully',
             email: user.email
-            , token
         })
 
     } catch (error) {
@@ -67,9 +73,15 @@ const login = async (req, res) => {
             config.JWT_SECRET,
             { expiresIn: "2d" }
         );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 2 * 24 * 60 * 60 * 1000
+        });
         res.status(200).json({
-            message: "login successful",
-            token
+            message: "login successful"
         });
 
     } catch (error) {
@@ -81,7 +93,7 @@ const login = async (req, res) => {
 }
 
 const getMe = async (req, res) => {
-    try { 
+    try {
         const user = await userModel.findById(req.user.id);
         if (!user) {
             return res.status(404).json({
@@ -104,4 +116,15 @@ const getMe = async (req, res) => {
     }
 }
 
-module.exports = { register, login, getMe };
+const logout = (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+    });
+    res.status(200).json({
+        message: "logged out successfully"
+    });
+};
+
+module.exports = { register, login, getMe, logout };

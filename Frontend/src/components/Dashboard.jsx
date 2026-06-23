@@ -23,17 +23,12 @@ const Dashboard = () => {
     const getPosts = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setLoading(false);
-          return;
-        }
         const [postsRes, statsRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_URL}/posts/my-posts`, {
-            headers: { Authorization: `Bearer ${token}` },
+            credentials:"include"
           }),
           fetch(`${import.meta.env.VITE_API_URL}/posts/user/stats`, {
-            headers: { Authorization: `Bearer ${token}` },
+            credentials:"include"
           }),
         ]);
         if (!postsRes.ok) {

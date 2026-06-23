@@ -34,11 +34,8 @@ const PostDetails = () => {
         const fetchPost = async () => {
             try {
                 setLoading(true);
-                const token = localStorage.getItem("token");
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                    credentials:"include"
                 })
                 const data = await res.json();
 
@@ -61,12 +58,9 @@ const PostDetails = () => {
     const handleDelete = async () => {
         try {
             setLoading(true)
-            const token = localStorage.getItem("token");
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
                 method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                credentials:"include"
             });
             if (!res.ok) throw new Error("Failed to delete post");
 
@@ -83,13 +77,12 @@ const PostDetails = () => {
         e.preventDefault();
 
         try {
-            const token = localStorage.getItem("token");
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
                 },
+                credentials:"include",
                 body: JSON.stringify({ title: editTitle, content: editContent })
             });
 
@@ -123,12 +116,9 @@ const PostDetails = () => {
 
         setIsLiking(true);
         try {
-            const token = localStorage.getItem("token");
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/like`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                credentials:"include"
             });
 
             if (!res.ok) {
@@ -151,7 +141,6 @@ const PostDetails = () => {
 
         try {
             setIsCommenting(true);
-            const token = localStorage.getItem("token");
             const commentData = {
                 postId: id,
                 userId: user._id,
@@ -161,8 +150,8 @@ const PostDetails = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
                 },
+                credentials:"include",
                 body: JSON.stringify(commentData)
             });
 
@@ -181,12 +170,9 @@ const PostDetails = () => {
 
     const handleDeleteComment = async () => {
         try {
-            const token = localStorage.getItem("token");
             const res = await fetch(`${import.meta.env.VITE_API_URL}/comment/${commentToDelete}`, {
                 method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                credentials:"include"
             });
             if (!res.ok) throw new Error("Failed to delete comment");
             setComments(prevComments => prevComments.filter(comment => comment._id !== commentToDelete));
@@ -201,13 +187,9 @@ const PostDetails = () => {
     useEffect(() => {
         const getComments = async () => {
             try {
-                const token = localStorage.getItem("token");
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/comment`, {
                     method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-
+                    credentials:"include"
                 })
                 const data = await res.json();
                 if (!res.ok) {

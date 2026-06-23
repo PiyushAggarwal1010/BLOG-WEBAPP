@@ -11,21 +11,13 @@ const AuthProvider = ({ children }) => {
 
     const checkAuth = async () => {
         setLoading(true);
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setIsLoggedIn(false);
-            setLoading(false);
-            return;
-        }
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/getMe`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                credentials: "include"
             });
             if (!res.ok) {
-                localStorage.removeItem("token");
                 setIsLoggedIn(false);
+                setUser(null);
                 setLoading(false);
                 return;
             }
@@ -51,6 +43,7 @@ const AuthProvider = ({ children }) => {
             headers: {
                 "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify({ email, password }),
         });
 
@@ -59,8 +52,6 @@ const AuthProvider = ({ children }) => {
         if (!response.ok) {
             throw new Error(res.message);
         }
-
-        localStorage.setItem("token", res.token);
 
         await checkAuth();
     };
@@ -76,6 +67,7 @@ const AuthProvider = ({ children }) => {
             headers: {
                 'Content-Type': "application/json"
             },
+            credentials: "include",
             body: JSON.stringify(newUser)
         })
 
@@ -84,12 +76,15 @@ const AuthProvider = ({ children }) => {
             throw new Error(res.message);
         }
 
-        localStorage.setItem("token", res.token);
         await checkAuth();
     }
 
-    const logout = () => {
-        localStorage.removeItem("token");
+    const logout =async () => {
+        await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+            method: "POST",
+            credentials: "include"
+        });
+
         setUser(null);
         setIsLoggedIn(false);
     };

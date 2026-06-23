@@ -8,5 +8,6 @@ const validateSchema=require("../validators/auth_validator")
 router.post('/register',validateMiddleware(validateSchema.signupSchema), authController.register);
 router.post('/login',validateMiddleware(validateSchema.loginSchema),authController.login);
 router.get('/getMe',authMiddleware,authController.getMe);
+router.post('/logout',authMiddleware,authController.logout);
 
 module.exports=router;

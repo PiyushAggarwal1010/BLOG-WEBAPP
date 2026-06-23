@@ -39,12 +39,9 @@ const AddPost = () => {
             formData.append("image", image);
         }
         try {
-            const token = localStorage.getItem("token");
             const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
                 method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
+                credentials:"include",
                 body: formData
             });
             const res = await response.json();
