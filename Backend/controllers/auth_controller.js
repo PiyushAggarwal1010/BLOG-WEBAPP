@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 
 const register = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
-
+        const { username, password } = req.body;
+        const email = req.body.email.toLowerCase();
         const isAlreadyRegistered = await userModel.findOne({
             $or: [
                 { username },
@@ -41,7 +41,11 @@ const register = async (req, res) => {
 
         res.status(201).json({
             message: 'user created succesfully',
-            email: user.email
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email
+            }
         })
 
     } catch (error) {
@@ -54,7 +58,8 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { password } = req.body;
+        const email = req.body.email.toLowerCase();
         const user = await userModel.findOne({ email });
         if (!user) {
             return res.status(404).json({
@@ -81,7 +86,12 @@ const login = async (req, res) => {
             maxAge: 2 * 24 * 60 * 60 * 1000
         });
         res.status(200).json({
-            message: "login successful"
+            message: "login successful",
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email
+            }
         });
 
     } catch (error) {

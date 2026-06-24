@@ -8,6 +8,7 @@ import { FaHeart } from "react-icons/fa";
 import Loader from './Loader';
 import ConfirmModal from './ConfirmModal';
 import ReactMarkdown from "react-markdown";
+import { HiSparkles } from "react-icons/hi2";
 
 const PostDetails = () => {
     const { id } = useParams();
@@ -30,12 +31,16 @@ const PostDetails = () => {
     const [isCommenting, setIsCommenting] = useState(false);
     const [commentToDelete, setCommentToDelete] = useState(null);
 
+    const [summary, setSummary] = useState(null);
+    const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+    const [summaryError, setSummaryError] = useState(null);
+
     useEffect(() => {
         const fetchPost = async () => {
             try {
                 setLoading(true);
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
-                    credentials:"include"
+                    credentials: "include"
                 })
                 const data = await res.json();
 
@@ -60,7 +65,7 @@ const PostDetails = () => {
             setLoading(true)
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}`, {
                 method: "DELETE",
-                credentials:"include"
+                credentials: "include"
             });
             if (!res.ok) throw new Error("Failed to delete post");
 
@@ -82,7 +87,7 @@ const PostDetails = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                credentials:"include",
+                credentials: "include",
                 body: JSON.stringify({ title: editTitle, content: editContent })
             });
 
@@ -93,6 +98,7 @@ const PostDetails = () => {
             toast.success("Post updated!");
 
             setPost({ ...post, title: editTitle, content: editContent });
+            setSummary(null);
             setIsEditing(false);
         } catch (error) {
             toast.error(error.message);
@@ -118,7 +124,7 @@ const PostDetails = () => {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/like`, {
                 method: "POST",
-                credentials:"include"
+                credentials: "include"
             });
 
             if (!res.ok) {
@@ -151,7 +157,7 @@ const PostDetails = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                credentials:"include",
+                credentials: "include",
                 body: JSON.stringify(commentData)
             });
 
@@ -172,7 +178,7 @@ const PostDetails = () => {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/comment/${commentToDelete}`, {
                 method: "DELETE",
-                credentials:"include"
+                credentials: "include"
             });
             if (!res.ok) throw new Error("Failed to delete comment");
             setComments(prevComments => prevComments.filter(comment => comment._id !== commentToDelete));
@@ -189,7 +195,7 @@ const PostDetails = () => {
             try {
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/posts/${id}/comment`, {
                     method: "GET",
-                    credentials:"include"
+                    credentials: "include"
                 })
                 const data = await res.json();
                 if (!res.ok) {
@@ -202,6 +208,32 @@ const PostDetails = () => {
         };
         getComments();
     }, [id])
+
+    const handleGenerateSummary = async () => {
+        if (isGeneratingSummary) return;
+        try {
+            setIsGeneratingSummary(true);
+            setSummaryError(null);
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/ai/summary`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: "include",
+                body: JSON.stringify({ content: post.content })
+            });
+
+            if (!response.ok) throw new Error("Failed to generate summary.");
+
+            const data = await response.json();
+            setSummary(data.summary);
+
+        } catch (error) {
+            setSummaryError("Failed to generate summary.");
+            console.error(error);
+        } finally {
+            setIsGeneratingSummary(false);
+        }
+    };
 
     if (loading) return <Loader />;
     if (!post) return null;
@@ -297,6 +329,56 @@ const PostDetails = () => {
                             />
                         )}
 
+                        {/* summary */}
+                        <div className="mb-6">
+                            {!summary && !isGeneratingSummary && (
+                                <button
+                                    onClick={handleGenerateSummary}
+                                    className="flex items-center gap-2 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 px-4 py-2 rounded-full text-sm font-medium transition-colors border border-stone-200 dark:border-stone-700 shadow-sm"
+                                > 
+                                    <HiSparkles className="text-amber-500 text-lg" />
+                                    <span className="font-semibold">Summarize with AI</span>
+                                </button>
+                            )}
+
+                            {isGeneratingSummary && (
+                                <div className="flex items-center gap-3 text-stone-500 dark:text-stone-400 text-sm font-medium px-4 py-2">
+                                    <div className="w-4 h-4 border-2 border-stone-400 border-t-transparent rounded-full animate-spin"></div>
+                                    <HiSparkles className="text-amber-500 text-lg" />
+                                    Summarizing...
+                                </div>
+                            )}
+
+                            {summaryError && (
+                                <div className="text-rose-500 text-sm font-medium px-4 py-2">
+                                    {summaryError}
+                                </div>
+                            )}
+
+                            {summary && (
+                                <div className="bg-linear-to-br from-stone-50 to-stone-100 dark:from-stone-900 dark:to-stone-800 border border-stone-200 dark:border-stone-700 p-5 rounded-xl shadow-sm relative transition-all">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <HiSparkles className="text-amber-500 text-lg" />
+                                        <h3 className="text-sm uppercase tracking-widest font-bold text-stone-800 dark:text-stone-200">
+                                            AI Summary
+                                        </h3>
+                                    </div>
+                                    <div className="prose prose-sm prose-stone dark:prose-invert max-w-none text-stone-600 dark:text-stone-300 text-sm leading-relaxed">
+                                        <ReactMarkdown>
+                                            {summary}
+                                        </ReactMarkdown>
+                                    </div>
+                                    <button
+                                        onClick={() => setSummary(null)}
+                                        className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors"
+                                        title="Dismiss"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="prose prose-stone dark:prose-invert max-w-none prose-img:rounded-xl prose-a:text-rose-600 dark:prose-a:text-rose-400 hover:prose-a:text-rose-500 dark:hover:prose-a:text-rose-300">
                             <ReactMarkdown>
                                 {post.content}
@@ -365,7 +447,7 @@ const PostDetails = () => {
                                                     <p className="block w-full text-sm text-stone-600 dark:text-stone-300 leading-relaxed wrap-break-word whitespace-pre-wrap">
                                                         {c.content}
                                                     </p>
-                                                    {user?._id === c.userId._id && (
+                                                    {user?._id === c.userId?._id && (
                                                         <div className="flex justify-end mt-2">
                                                             <button
                                                                 onClick={() => setCommentToDelete(c._id)}

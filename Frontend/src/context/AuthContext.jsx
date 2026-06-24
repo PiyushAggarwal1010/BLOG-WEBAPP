@@ -53,7 +53,8 @@ const AuthProvider = ({ children }) => {
             throw new Error(res.message);
         }
 
-        await checkAuth();
+        setUser(res.user); 
+        setIsLoggedIn(true);
     };
 
     const register = async (username, email, password) => {
@@ -76,7 +77,8 @@ const AuthProvider = ({ children }) => {
             throw new Error(res.message);
         }
 
-        await checkAuth();
+        setUser(res.user); 
+        setIsLoggedIn(true);
     }
 
     const logout =async () => {

@@ -20,10 +20,15 @@ if (!process.env.CLOUDINARY_API_SECRET) {
   throw new Error("CLOUDINARY_API_SECRET is not defined");
 }
 
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY is not defined");
+}
+
 const config ={
     MONGODB_URI: process.env.MONGODB_URI,
     JWT_SECRET: process.env.JWT_SECRET,
-
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    
     CLOUDINARY: {
     CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     API_KEY: process.env.CLOUDINARY_API_KEY,
