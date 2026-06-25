@@ -5,6 +5,7 @@ import Card from './Card';
 import Header from './Header';
 import { useSearchParams } from 'react-router-dom';
 import Loader from './Loader';
+import toast from 'react-hot-toast';
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);

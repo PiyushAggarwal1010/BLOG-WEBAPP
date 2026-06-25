@@ -9,6 +9,7 @@ import Loader from './Loader';
 import ConfirmModal from './ConfirmModal';
 import ReactMarkdown from "react-markdown";
 import { HiSparkles } from "react-icons/hi2";
+import { io } from 'socket.io-client';
 
 const PostDetails = () => {
     const { id } = useParams();
@@ -34,6 +35,39 @@ const PostDetails = () => {
     const [summary, setSummary] = useState(null);
     const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
     const [summaryError, setSummaryError] = useState(null);
+
+    const [socket, setSocket] = useState(null);
+    useEffect(() => {
+        const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+        const newSocket = io(baseUrl);
+        setSocket(newSocket);
+
+        newSocket.emit('join_post', id);
+
+        newSocket.on('receive_comment', (incomingComment) => {
+            setComments((prev) => {
+                // to avoid duplicate comments
+                const alreadyExists = prev.some(c => c._id === incomingComment._id);
+                if (alreadyExists) return prev;
+
+                return [incomingComment, ...prev];
+            });
+        });
+
+        newSocket.on('comment_deleted', (deletedCommentId) => {
+            setComments((prev) => {
+                return prev.filter(comment => comment._id !== deletedCommentId);
+            });
+        });
+
+        newSocket.on('receive_like', (data) => {
+            setLikesCount(data.newLikesCount);
+        });
+
+        return () => {
+            newSocket.disconnect();
+        };
+    }, [id]);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -165,7 +199,13 @@ const PostDetails = () => {
             if (!res.ok) {
                 throw new Error(data.message || "Failed to comment on post");
             }
-            setComments((prev) => [data.comm, ...prev]);
+            setComments((prev) => {
+                // to prevent duplicate comments
+                const alreadyExists = prev.some(c => c._id === data.comm._id);
+                if (alreadyExists) return prev;
+
+                return [data.comm, ...prev];
+            });
             setNewComment("");
         } catch (error) {
             toast.error(error.message);
@@ -335,7 +375,7 @@ const PostDetails = () => {
                                 <button
                                     onClick={handleGenerateSummary}
                                     className="flex items-center gap-2 bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 px-4 py-2 rounded-full text-sm font-medium transition-colors border border-stone-200 dark:border-stone-700 shadow-sm"
-                                > 
+                                >
                                     <HiSparkles className="text-amber-500 text-lg" />
                                     <span className="font-semibold">Summarize with AI</span>
                                 </button>

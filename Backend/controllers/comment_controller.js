@@ -28,6 +28,11 @@ const AddComment = async (req, res) => {
             $inc: { commentsCount: 1 }
         });
 
+        const io = req.app.get('io');
+        if (io) {
+            io.to(postId).emit('receive_comment', populatedComment);
+        }
+
         return res.status(201).json({
             message: "Comment added successfully",
             comm: populatedComment
@@ -77,6 +82,10 @@ const deleteComment = async (req, res) => {
         await postModel.findByIdAndUpdate(postId, {
             $inc: { commentsCount: -1 }
         });
+        
+        const io = req.app.get('io');
+        io.to(postId.toString()).emit('comment_deleted', commentId);
+        
         return res.status(200).json({
             message: "Comment deleted successfully"
         })

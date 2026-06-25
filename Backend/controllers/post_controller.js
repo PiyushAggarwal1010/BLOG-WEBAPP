@@ -184,24 +184,27 @@ const handleLikes = async (req, res) => {
 
         if (!alreadyLiked) {
             post.likes.push(userId);
-            post.likesCount = post.likes.length;
-            await post.save();
-            return res.status(200).json({
-                message: 'Post liked',
-                likesCount: post.likesCount,
-                liked: true
-            });
         }
         else {
             post.likes = post.likes.filter(id => id.toString() !== userId);
-            post.likesCount = post.likes.length;
-            await post.save();
-            return res.status(200).json({
-                message: 'Post unliked',
-                likesCount: post.likesCount,
-                liked: false
+        }
+
+        post.likesCount = post.likes.length;
+        await post.save();
+
+        const io = req.app.get('io');
+        if (io) {
+            io.to(postId).emit('receive_like', {
+                postId: postId,
+                newLikesCount: post.likesCount
             });
         }
+
+        return res.status(200).json({
+            message: alreadyLiked ? 'Post unliked' : 'Post liked',
+            likesCount: post.likesCount,
+            liked: !alreadyLiked
+        });
 
     } catch (error) {
         console.error(error);
