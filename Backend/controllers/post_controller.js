@@ -81,7 +81,7 @@ const deleteMyPost = async (req, res) => {
                 message: "post not found"
             })
         }
-        if (post.author.toString() !== req.user.id) {
+        if (req.user.role !== 'admin' && post.author.toString() !== req.user.id) {
             return res.status(403).json({
                 message: "Not authorized to delete this post"
             })
@@ -113,7 +113,7 @@ const updateMyPost = async (req, res) => {
                 message: "post not found"
             })
         }
-        if (post.author.toString() !== req.user.id) {
+        if (req.user.role !== 'admin' && post.author.toString() !== req.user.id) {
             return res.status(403).json({
                 message: "Not authorized to update this post"
             })

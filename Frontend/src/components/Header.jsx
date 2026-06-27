@@ -41,7 +41,7 @@ const Header = () => {
         }
     }, [])
 
-    async function handleLogout(){
+    async function handleLogout() {
         try {
             await logout();
             navigate('/login');
@@ -72,7 +72,7 @@ const Header = () => {
         <header className="bg-white dark:bg-stone-950 border-b border-stone-200 dark:border-stone-800 sticky top-0 z-10 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 py-2 flex flex-col sm:flex-row gap-4 items-center justify-between">
 
-                <img src={theme==="light" ? logo : dark_logo} alt="Blog App" className='h-15 w-auto object-contain' />
+                <img src={theme === "light" ? logo : dark_logo} alt="Blog App" className='h-15 w-auto object-contain' />
 
                 <div className="flex items-center bg-stone-100 dark:bg-stone-900 rounded-full px-4 py-2.5 w-full sm:w-95 border border-transparent focus-within:border-stone-300 dark:focus-within:border-stone-600 focus-within:bg-white dark:focus-within:bg-stone-950 transition-all">
                     <input
@@ -106,6 +106,15 @@ const Header = () => {
 
                     <Link to="/" className="text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white transition-colors">Home</Link>
 
+                    {user?.role === 'admin' && (
+                        <Link
+                            to="/admin"
+                            className="text-amber-600 dark:text-amber-500 font-bold hover:opacity-80 transition-opacity"
+                        >
+                            Admin Panel
+                        </Link>
+                    )}
+                    
                     {isLoggedIn ? (
                         <div ref={dropdownRef} className="relative" >
                             <button

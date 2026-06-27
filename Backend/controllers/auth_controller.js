@@ -27,16 +27,17 @@ const register = async (req, res) => {
         })
 
         const token = jwt.sign({
-            id: user._id
+            id: user._id,
+            role: user.role
         }, config.JWT_SECRET, {
-            expiresIn: '2d'
+            expiresIn: '7d'
         })
 
         res.cookie("token", token, {
             httpOnly: true,
             secure: true,
             sameSite: "none",
-            maxAge: 2 * 24 * 60 * 60 * 1000 // 2 days
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
         res.status(201).json({
@@ -44,7 +45,8 @@ const register = async (req, res) => {
             user: {
                 _id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
         })
 
@@ -74,23 +76,27 @@ const login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user._id },
+            {   
+                id: user._id,
+                role: user.role
+             },
             config.JWT_SECRET,
-            { expiresIn: "2d" }
+            { expiresIn: "7d" }
         );
 
         res.cookie("token", token, {
             httpOnly: true,
             secure: true,
             sameSite: "none",
-            maxAge: 2 * 24 * 60 * 60 * 1000
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
         res.status(200).json({
             message: "login successful",
             user: {
                 _id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
         });
 
@@ -115,7 +121,8 @@ const getMe = async (req, res) => {
             user: {
                 _id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
         })
     } catch (error) {

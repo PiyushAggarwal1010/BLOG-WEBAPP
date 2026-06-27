@@ -6,6 +6,8 @@ import { Toaster } from "react-hot-toast";
 import PostDetails from './components/PostDetails';
 import Dashboard from './components/Dashboard';
 import Protected from './components/Protected';
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './components/AdminDashboard';
 import Register from './components/Register';
 import AddPost from './components/AddPost';
 import Login from './components/Login';
@@ -55,6 +57,16 @@ const router = createBrowserRouter(
         </Protected>
       </div>
     },
+    {
+      path: "/admin",
+      element: <AdminRoute />,
+      children: [
+        {
+          path: "",
+          element: <AdminDashboard /> // The content that replaces <Outlet />
+        }
+      ]
+    }
   ]
 )
 

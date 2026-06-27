@@ -7,6 +7,7 @@ const auth_router = require('./routes/auth_routes')
 const post_router = require('./routes/post_routes')
 const comment_router = require('./routes/comment_routes')
 const ai_router = require('./routes/ai_routes');
+const admin_router=require('./routes/admin_routes');
 const cors = require('cors')
 const cookieParser = require("cookie-parser");
 
@@ -41,6 +42,7 @@ app.use('/api/auth', auth_router);
 app.use('/api/posts', post_router);
 app.use('/api', comment_router);
 app.use('/api/ai', ai_router);
+app.use('/api/admin',admin_router);
 
 app.get('/', (req, res) => {
   res.send('Server Running');

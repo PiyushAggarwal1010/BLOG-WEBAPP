@@ -71,7 +71,7 @@ const deleteComment = async (req, res) => {
         }
         const userId = req.user.id;
 
-        if (!comment.userId.equals(userId)) {
+        if (req.user.role !== 'admin' && !comment.userId.equals(userId)) {
             return res.status(403).json({ message: "Unauthorized to delete this comment" })
         }
 
@@ -82,10 +82,10 @@ const deleteComment = async (req, res) => {
         await postModel.findByIdAndUpdate(postId, {
             $inc: { commentsCount: -1 }
         });
-        
+
         const io = req.app.get('io');
         io.to(postId.toString()).emit('comment_deleted', commentId);
-        
+
         return res.status(200).json({
             message: "Comment deleted successfully"
         })

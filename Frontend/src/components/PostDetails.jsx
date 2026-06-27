@@ -277,8 +277,9 @@ const PostDetails = () => {
 
     if (loading) return <Loader />;
     if (!post) return null;
-    const isOwner = user?._id === post.author?._id;
 
+    const isOwner = user?._id === post.author?._id;
+    const isAdmin = user?.role === 'admin';
     return (
         <div className="bg-stone-50 dark:bg-stone-950 min-h-screen text-stone-800 dark:text-stone-200 font-sans transition-colors duration-300">
             <Header />
@@ -339,7 +340,7 @@ const PostDetails = () => {
                                 <span className="text-stone-400 dark:text-stone-500 text-sm uppercase tracking-widest font-semibold">By- {post.author.username}</span>
                             </div>
 
-                            {isOwner && (
+                            {(isOwner || isAdmin) && (
                                 <div className="flex gap-3">
                                     <button
                                         onClick={() => {
@@ -487,7 +488,7 @@ const PostDetails = () => {
                                                     <p className="block w-full text-sm text-stone-600 dark:text-stone-300 leading-relaxed wrap-break-word whitespace-pre-wrap">
                                                         {c.content}
                                                     </p>
-                                                    {user?._id === c.userId?._id && (
+                                                    {(user?._id === c.userId?._id || isAdmin) && (
                                                         <div className="flex justify-end mt-2">
                                                             <button
                                                                 onClick={() => setCommentToDelete(c._id)}
