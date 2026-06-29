@@ -1,15 +1,19 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const connectDB = require('./config/db')
+const connectDB = require('./config/db');
+
+const cors = require('cors');
+const helmet = require('helmet');
 const morgan = require('morgan');
-const auth_router = require('./routes/auth_routes')
-const post_router = require('./routes/post_routes')
-const comment_router = require('./routes/comment_routes')
-const ai_router = require('./routes/ai_routes');
-const admin_router=require('./routes/admin_routes');
-const cors = require('cors')
 const cookieParser = require("cookie-parser");
+const errorHandler = require('./middleware/error_middleware');
+
+const comment_router = require('./routes/comment_routes');
+const admin_router = require('./routes/admin_routes');
+const auth_router = require('./routes/auth_routes');
+const post_router = require('./routes/post_routes');
+const ai_router = require('./routes/ai_routes');
 
 const app = express();
 const server = http.createServer(app);
@@ -34,19 +38,24 @@ const corsOptions = {
     origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
     credentials: true,
 };
+
+app.use(helmet());
 app.use(cors(corsOptions));
 app.use(cookieParser())
 app.use(express.json());
 app.use(morgan('dev'));
+
+app.get('/', (req, res) => {
+  res.send('Server Running');
+});
+
 app.use('/api/auth', auth_router);
 app.use('/api/posts', post_router);
 app.use('/api', comment_router);
 app.use('/api/ai', ai_router);
 app.use('/api/admin',admin_router);
 
-app.get('/', (req, res) => {
-  res.send('Server Running');
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

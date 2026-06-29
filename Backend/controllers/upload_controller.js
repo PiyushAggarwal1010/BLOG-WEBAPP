@@ -1,14 +1,16 @@
-const uploadImage = (req, res) => {
+const uploadImage = (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      const error = new Error("No file uploaded");
+      error.statusCode = 400;
+      return next(error);
     }
 
     res.json({
       imageUrl: req.file.path,
     });
   } catch (error) {
-    res.status(500).json({ message: "Upload failed" });
+    next(error);
   }
 };
 

@@ -1,7 +1,7 @@
 const userModel = require("../models/user_model");
 const mongoose = require('mongoose');
 
-const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res, next) => {
     try {
         let limit = parseInt(req.query.limit) || 4;
         const cursor = req.query.cursor;
@@ -10,7 +10,9 @@ const getAllUsers = async (req, res) => {
 
         if (cursor) {
             if (!mongoose.isValidObjectId(cursor)) {
-                return res.status(400).json({ message: "Invalid cursor format" });
+                const error = new Error("Invalid cursor format");
+                error.statusCode = 400;
+                return next(error);
             }
             query._id = { $lt: new mongoose.Types.ObjectId(cursor) };
         }
@@ -34,8 +36,8 @@ const getAllUsers = async (req, res) => {
             totalUsers
         });
 
-    } catch (err) {
-        res.status(500).json({ message: "Internal server error while fetching users" });
+    } catch (error) {
+        next(error);
     }
 }
 

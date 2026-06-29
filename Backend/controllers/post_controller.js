@@ -4,13 +4,13 @@ const config = require('../config/config')
 const cloudinary = require("../config/cloudinary");
 const mongoose = require('mongoose');
 
-const createPost = async (req, res) => {
+const createPost = async (req, res, next) => {
     try {
         const { title, content } = req.body;
         if (!title || !content) {
-            return res.status(400).json({
-                message: "title and content is required"
-            })
+            const error = new Error("Title and Content are required");
+            error.statusCode = 400;
+            return next(error);
         }
         const imageUrl = req.file ? req.file.path : null;
         const imagePublicId = req.file ? req.file.filename : "";
@@ -31,14 +31,11 @@ const createPost = async (req, res) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "internal server error",
-        })
+        next(error);
     }
 }
 
-const getAllPosts = async (req, res) => {
+const getAllPosts = async (req, res, next) => {
     try {
         const posts = await postModel
             .find({})
@@ -50,41 +47,41 @@ const getAllPosts = async (req, res) => {
             posts
         })
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            message: "internal server error"
-        })
+        next(error);
     }
 }
 
-const getMyPosts = async (req, res) => {
+const getMyPosts = async (req, res, next) => {
     try {
         const id = req.user.id;
-        const posts = await postModel.find({ author: id }).populate('author', 'username').sort({ createdAt: -1 });
+        const posts = await postModel
+            .find({ author: id })
+            .populate('author', 'username')
+            .sort({ createdAt: -1 })
+            .lean();
+
         res.status(200).json({
             message: "Posts fetched successfully",
             posts
         })
     } catch (error) {
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
+        next(error);
     }
 }
 
-const deleteMyPost = async (req, res) => {
+const deleteMyPost = async (req, res, next) => {
     try {
         const postId = req.params.id;
         const post = await postModel.findById(postId);
         if (!post) {
-            return res.status(404).json({
-                message: "post not found"
-            })
+            const error = new Error("Post not found");
+            error.statusCode = 404;
+            return next(error);
         }
         if (req.user.role !== 'admin' && post.author.toString() !== req.user.id) {
-            return res.status(403).json({
-                message: "Not authorized to delete this post"
-            })
+            const error = new Error("Not authorized to delete this post");
+            error.statusCode = 403;
+            return next(error);
         }
         if (post.image?.public_id) {
             await cloudinary.uploader.destroy(post.image.public_id);
@@ -97,33 +94,30 @@ const deleteMyPost = async (req, res) => {
             message: "post deleted successfully"
         })
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
+        next(error);
     }
 }
 
-const updateMyPost = async (req, res) => {
+const updateMyPost = async (req, res, next) => {
     try {
         const postId = req.params.id;
         const post = await postModel.findById(postId);
         if (!post) {
-            return res.status(404).json({
-                message: "post not found"
-            })
+            const error = new Error("Post not found");
+            error.statusCode = 404;
+            return next(error);
         }
         if (req.user.role !== 'admin' && post.author.toString() !== req.user.id) {
-            return res.status(403).json({
-                message: "Not authorized to update this post"
-            })
+            const error = new Error("Not authorized to update this post");
+            error.statusCode = 403;
+            return next(error);
         }
 
         const { title, content } = req.body;
         if (!title && !content) {
-            return res.status(400).json({
-                message: "Nothing to update"
-            });
+            const error = new Error("Title and content are required");
+            error.statusCode = 400;
+            return next(error);
         }
         post.title = title || post.title;
         post.content = content || post.content;
@@ -133,14 +127,11 @@ const updateMyPost = async (req, res) => {
             message: "post updated succesfully"
         })
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
+        next(error);
     }
 }
 
-const getSinglePost = async (req, res) => {
+const getSinglePost = async (req, res, next) => {
     try {
         const postId = req.params.id;
         const userId = req.user?.id;
@@ -148,9 +139,9 @@ const getSinglePost = async (req, res) => {
         const post = await postModel.findById(postId).populate('author', 'username');
 
         if (!post) {
-            return res.status(404).json({
-                message: "post not found",
-            })
+            const error = new Error("Post not found");
+            error.statusCode = 404;
+            return next(error);
         }
         const isLiked = userId
             ? post.likes.some(id => id.toString() === userId)
@@ -162,82 +153,97 @@ const getSinglePost = async (req, res) => {
             liked: isLiked
         })
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-const handleLikes = async (req, res) => {
+const handleLikes = async (req, res, next) => {
     try {
         const postId = req.params.id;
         const userId = req.user.id;
 
-        const post = await postModel.findById(postId);
+        const post = await postModel.findById(postId).select('likes');
 
         if (!post) {
-            return res.status(404).json({ message: "Post not found" });
+            const error = new Error("Post not found");
+            error.statusCode = 404;
+            return next(error);
         }
 
-        const alreadyLiked = post.likes.some(
-            (id) => id.toString() === userId
-        );
+        const alreadyLiked = post.likes.includes(userId);
 
+        let updatedPost;
         if (!alreadyLiked) {
-            post.likes.push(userId);
+            updatedPost = await postModel.findByIdAndUpdate(
+                postId,
+                {
+                    $addToSet: { likes: userId },
+                    $inc: { likesCount: 1 }
+                },
+                { new: true, select: 'likesCount' }
+            );
+        } else {
+            updatedPost = await postModel.findByIdAndUpdate(
+                postId,
+                {
+                    $pull: { likes: userId },
+                    $inc: { likesCount: -1 }
+                },
+                { new: true, select: 'likesCount' }
+            );
         }
-        else {
-            post.likes = post.likes.filter(id => id.toString() !== userId);
-        }
-
-        post.likesCount = post.likes.length;
-        await post.save();
 
         const io = req.app.get('io');
         if (io) {
             io.to(postId).emit('receive_like', {
                 postId: postId,
-                newLikesCount: post.likesCount
+                newLikesCount: updatedPost.likesCount
             });
         }
 
         return res.status(200).json({
             message: alreadyLiked ? 'Post unliked' : 'Post liked',
-            likesCount: post.likesCount,
+            likesCount: updatedPost.likesCount,
             liked: !alreadyLiked
         });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-const getUserStats = async (req, res) => {
+const getUserStats = async (req, res, next) => {
     try {
         const userId = req.user?.id;
 
-        const totalPosts = await postModel.countDocuments({ author: userId });
-        const userPosts = await postModel.find({ author: userId });
+        const stats = await postModel.aggregate([
+            {
+                $match: { author: new mongoose.Types.ObjectId(userId) }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalPosts: { $sum: 1 },
+                    totalLikes: { $sum: "$likesCount" },
+                    totalComments: { $sum: "$commentsCount" }
+                }
+            }
+        ]);
 
-        let totalLikes = 0;
-        let totalComments = 0;
-        userPosts.forEach(post => {
-            totalLikes += post.likesCount;
-            totalComments += post.commentsCount;
-        });
+        const result = stats[0] || { totalPosts: 0, totalComments: 0, totalLikes: 0 };
 
         res.json({
-            totalPosts,
-            totalComments,
-            totalLikes,
+            totalPosts: result.totalPosts,
+            totalComments: result.totalComments,
+            totalLikes: result.totalLikes,
         });
 
-    } catch (err) {
-        res.status(500).json({ message: "Error fetching stats" });
+    } catch (error) {
+        next(error);
     }
 };
 
-const getPosts = async (req, res) => {
+const getPosts = async (req, res, next) => {
     try {
         let limit = parseInt(req.query.limit) || 8;
         if (limit > 48) limit = 48;
@@ -255,7 +261,9 @@ const getPosts = async (req, res) => {
 
         if (cursor) {
             if (!mongoose.isValidObjectId(cursor)) {
-                return res.status(400).json({ message: "Invalid cursor format" });
+                const error = new Error("Invalid cursor format");
+                error.statusCode = 400;
+                return next(error);
             }
             query._id = { $lt: new mongoose.Types.ObjectId(cursor) };
         }
@@ -263,7 +271,8 @@ const getPosts = async (req, res) => {
         const posts = await postModel.find(query)
             .sort({ _id: -1 })
             .populate('author', 'username')
-            .limit(limit + 1); //+1 for checking next page
+            .limit(limit + 1) //+1 for checking next page
+            .lean();
 
         const hasNextPage = posts.length > limit;
         if (hasNextPage) {
@@ -275,8 +284,8 @@ const getPosts = async (req, res) => {
             nextCursor: hasNextPage ? posts[posts.length - 1]._id : null
         });
 
-    } catch (err) {
-        res.status(500).json({ message: "Error fetching posts" });
+    } catch (error) {
+        next(error);
     }
 };
 

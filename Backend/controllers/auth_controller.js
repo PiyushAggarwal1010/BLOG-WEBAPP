@@ -3,7 +3,7 @@ const config = require('../config/config')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
     try {
         const { username, password } = req.body;
         const email = req.body.email.toLowerCase();
@@ -14,9 +14,9 @@ const register = async (req, res) => {
             ]
         })
         if (isAlreadyRegistered) {
-            return res.status(409).json({
-                message: "username or email already exists"
-            })
+            const error = new Error("Username or Email already exists");
+            error.statusCode = 409;
+            return next(error);
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -51,35 +51,32 @@ const register = async (req, res) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "internal server error"
-        })
+        next(error);
     }
 }
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
     try {
         const { password } = req.body;
         const email = req.body.email.toLowerCase();
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.status(404).json({
-                message: "user not found"
-            })
+            const error = new Error("User not found");
+            error.statusCode = 404;
+            return next(error);
         }
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) {
-            return res.status(401).json({
-                message: "invalid password"
-            })
+            const error = new Error("Invalid Password");
+            error.statusCode = 401;
+            return next(error);
         }
 
         const token = jwt.sign(
-            {   
+            {
                 id: user._id,
                 role: user.role
-             },
+            },
             config.JWT_SECRET,
             { expiresIn: "7d" }
         );
@@ -101,20 +98,17 @@ const login = async (req, res) => {
         });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "internal server error"
-        })
+        next(error);
     }
 }
 
-const getMe = async (req, res) => {
+const getMe = async (req, res, next) => {
     try {
         const user = await userModel.findById(req.user.id);
         if (!user) {
-            return res.status(404).json({
-                message: "User not found"
-            });
+            const error = new Error("User not found");
+            error.statusCode = 404;
+            return next(error);
         }
         res.status(200).json({
             message: "fetched succesfully",
@@ -126,22 +120,23 @@ const getMe = async (req, res) => {
             }
         })
     } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Internal server error"
-        })
+        next(error);
     }
 }
 
-const logout = (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-    });
-    res.status(200).json({
-        message: "logged out successfully"
-    });
+const logout = (req, res, next) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+        });
+        res.status(200).json({
+            message: "logged out successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
 module.exports = { register, login, getMe, logout };

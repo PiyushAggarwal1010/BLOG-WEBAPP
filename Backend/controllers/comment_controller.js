@@ -2,19 +2,23 @@ const commentModel = require("../models/comment_model");
 const postModel = require("../models/post_model");
 const config = require('../config/config');
 
-const AddComment = async (req, res) => {
+const AddComment = async (req, res,next) => {
     try {
         const { content } = req.body;
         const postId = req.params.id;
         const userId = req.user.id;
 
         if (!content) {
-            return res.status(400).json({ message: "Content is required" });
+            const error = new Error("Content is required");
+            error.statusCode = 400;
+            return next(error);
         }
 
         const post = await postModel.findById(postId);
         if (!post) {
-            return res.status(404).json({ message: "Post not found" });
+            const error = new Error("Post not found");
+            error.statusCode = 404;
+            return next(error);
         }
 
         const comm = await commentModel.create({
@@ -39,12 +43,11 @@ const AddComment = async (req, res) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-const getAllComments = async (req, res) => {
+const getAllComments = async (req, res,next) => {
     try {
         const postId = req.params.id;
         const comments = await commentModel
@@ -57,22 +60,25 @@ const getAllComments = async (req, res) => {
             comments
         })
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
-const deleteComment = async (req, res) => {
+const deleteComment = async (req, res,next) => {
     try {
         const commentId = req.params.id;
         const comment = await commentModel.findById(commentId);
         if (!comment) {
-            return res.status(404).json({ message: "Comment not found" });
+            const error = new Error("Comment not found");
+            error.statusCode = 404;
+            return next(error);
         }
         const userId = req.user.id;
 
         if (req.user.role !== 'admin' && !comment.userId.equals(userId)) {
-            return res.status(403).json({ message: "Unauthorized to delete this comment" })
+            const error = new Error("Unauthorized to delete this comment");
+            error.statusCode = 403;
+            return next(error);
         }
 
         const postId = comment.postId;
@@ -91,8 +97,7 @@ const deleteComment = async (req, res) => {
         })
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        next(error);
     }
 }
 
