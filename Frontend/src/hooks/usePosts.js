@@ -14,6 +14,11 @@ export const usePosts = (searchQuery) => {
         `${import.meta.env.VITE_API_URL}/posts?${params.toString()}`
       );
 
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "Failed to fetch posts");
+      }
+
       return res.json();
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,

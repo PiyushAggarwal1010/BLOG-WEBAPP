@@ -33,7 +33,10 @@ const Home = () => {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-        isLoading
+        isLoading,
+        isError,
+        error,
+        refetch
     } = usePosts(searchQuery);
 
     const posts = data?.pages.flatMap((page) => page.posts) || [];
@@ -56,6 +59,18 @@ const Home = () => {
                 )}
                 {isLoading ? (
                     <Loader />
+                ) : isError ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <p className="text-rose-500 dark:text-rose-400 font-medium text-lg mb-6 text-center">
+                            Failed to load posts: {error?.message}
+                        </p>
+                        <button
+                            onClick={() => refetch()}
+                            className="px-6 py-2.5 bg-stone-900 dark:bg-white text-white dark:text-stone-900 rounded-full font-medium hover:bg-stone-800 dark:hover:bg-stone-200 transition-colors shadow-sm"
+                        >
+                            Try Again
+                        </button>
+                    </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {posts.length > 0 ? (
@@ -78,7 +93,7 @@ const Home = () => {
                 <span className="text-xl leading-none mb-0.5">+</span> Add Post
             </button>
 
-            {!isLoading && hasNextPage && (
+            {!isLoading && !isError && hasNextPage && (
                 <div ref={ref} className="w-full flex justify-center items-center py-12">
                     {isFetchingNextPage ? (
                         <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 dark:border-stone-700 border-t-stone-900 dark:border-t-white" />

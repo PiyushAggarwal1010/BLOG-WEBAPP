@@ -41,12 +41,12 @@ const AddPost = () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
                 method: 'POST',
-                credentials:"include",
+                credentials: "include",
                 body: formData
             });
-            const res = await response.json();
             if (!response.ok) {
-                throw new Error(res.message);
+                const error = await response.json();
+                throw new Error(error.message || "Failed to create post");
             }
             toast.success("Post created!");
             navigate('/');

@@ -16,7 +16,9 @@ const signupSchema=z.object({
 
     password: z
     .string({required_error:"Password is required"})
-    .min(5,{message:"Password must be at least 5 characters"})
+    .min(8, {message:"Password must be at least 8 characters"})
+    .regex(/[a-zA-Z]/, { message: "Password must contain at least one letter." })
+    .regex(/[0-9]/, { message: "Password must contain at least one number." })
     .max(255,{message:"Password must not be more than 255 characters"}),
 })
 
