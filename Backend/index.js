@@ -46,9 +46,11 @@ app.use(cookieParser())
 app.use(express.json());
 app.use(morgan('dev'));
 
+app.set("trust proxy", 1); 
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 150,
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again after 15 minutes'
@@ -58,18 +60,19 @@ const limiter = rateLimit({
 });
 
 const authLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
-  message: { success: false, message: 'Too many login attempts. Try again in an hour.' }
+  windowMs: 15 * 60 * 1000,
+  max: 25,
+  message: { success: false, message: 'Too many login attempts. Try again in 15 minutes.' }
 });
-
-app.use(limiter);
 
 app.get('/', (req, res) => {
   res.send('Server Running');
 });
 
 app.use('/api/auth', authLimiter, auth_router);
+
+app.use(limiter);
+
 app.use('/api/posts', post_router);
 app.use('/api', comment_router);
 app.use('/api/ai', ai_router);
